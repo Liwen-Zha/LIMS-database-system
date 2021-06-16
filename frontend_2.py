@@ -68,10 +68,16 @@ def search_command():
 '''def check_command():
     ...'''
 
-def view_command():
+def view_logs_command():
     list.delete(0,END)
     for row in backend_2.view():
         list.insert(END,row)
+
+def check_samples_command(): # check all the samples current/final status
+    list.delete(0,END)
+    for row in backend_2.check():
+        list.insert(END,row)
+
 
 window = Tk()
 window.title('LIMS - Sample logbook')
@@ -152,11 +158,11 @@ button_add.grid(row=4,column=3)
 button_search = Button(window,text='Search log',width=15,pady=5,command=search_command)
 button_search.grid(row=5,column=3)
 
-'''button_check = Button(window,text='Check sample',width=15,pady=5,command=check_command)
-button_check.grid(row=6,column=3)'''
+button_view_logs = Button(window,text='View all logs',width=15,pady=5,command=view_logs_command)
+button_view_logs.grid(row=6,column=3)
 
-button_view = Button(window,text='View all logs',width=15,pady=5,command=view_command)
-button_view.grid(row=7,column=3)
+button_view_samples = Button(window,text='Check samples',width=15,pady=5,command=check_samples_command)
+button_view_samples.grid(row=7,column=3)
 
 button_close = Button(window,text='Close',width=15,pady=5,command = window.destroy)
 button_close.grid(row=8,column=3)

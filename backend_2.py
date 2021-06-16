@@ -1,11 +1,11 @@
 # Graph database - neo4j
 
 from check import *
-#from pandas import *
-#from calculateQ import *
+# from pandas import *
+# from calculateQ import *
 
 graph = Graph("http://localhost:7474", auth=("neo4j", "database_1"))
-#graph.delete_all()
+# graph.delete_all()
 
 def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
 
@@ -388,30 +388,61 @@ def view():
 
     return view_all
 
+def check():
 
+    global show_check, all_samples, uni_samples, uni_id, alone_samples, alone_id
+    show_check = list()
+    all_samples = list()
+    uni_id = list()
+    uni_samples = list()
+    alone_samples = list()
+    alone_id = list()
 
+    final_sample = graph.run("MATCH (s0: Sample)-[r: QUANTITY_CHANGE]-> (s1:Sample) RETURN s1").data()
 
+    # each node type in final_sample is expressed in: list(final_sample[0].values())[0]  first 0 ->1,2,3
+    init_id = list(final_sample[0].values())[0]['id']
+    uni_id.append(init_id)
+    uni_samples.append(list(final_sample[0].values())[0])
+    for each in final_sample[1:]:
+        each_node = list(each.values())[0]
+        each_sid = each_node['id']
+        if each_sid not in uni_id:
+            uni_id.append(each_sid)
+            uni_samples.append(each_node)
+        else:
+            id_index = uni_id.index(each_sid)
+            uni_samples[id_index] = each_node
 
+    #print(uni_id)
+    #print(uni_samples)
 
+    sample_nodes = graph.run("MATCH (a: Sample) RETURN a").data()
+    for each in sample_nodes:
+        every_node = list(each.values())[0]
+        every_sid = every_node['id']
+        if every_sid not in uni_id:
+            alone_samples.append(every_node)
+            alone_id.append(every_sid)
 
+    #print(alone_samples)
+    #print(alone_id)
+    #print(uni_id)
 
+    all_samples = uni_samples + alone_samples
+    #print(all_samples)
 
+    for each in all_samples:
+        records = graph.run("MATCH (n:Sample)-[r:IN]->(f:Freezer) WHERE id(n) = $s RETURN r",
+                            s=each.identity).data()
 
+        #print(records) # records: list records[0]: dict
+        find_where = list(records[0].values())[0] # r_where: class 'py2neo.data.IN'
+        txt_where = find_where.end_node['id']
+        #print(where)
 
+        txt = '{} {} of {} in {}'.format(each['Qnow'], each['Qnow_unit'], each['id'], txt_where)
+        # print(txt)
+        show_check.append(txt)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return show_check
