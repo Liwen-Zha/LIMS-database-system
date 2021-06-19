@@ -1,4 +1,4 @@
-# check.py is used to check:
+# check_existing.py is used to check:
 # 1. If there is already such freezer record in the database
 # 2. If there is already such person record in the database
 # 3. If there is any record about the sample in the database
@@ -8,7 +8,7 @@ from py2neo.matching import *
 
 graph = Graph("http://localhost:7474", auth=("neo4j", "database_1"))
 
-class Check(object):
+class Check_existing(object):
     def __init__(self, sample, freezer, person):
         self.sample = sample
         self.freezer = freezer

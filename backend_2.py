@@ -1,6 +1,6 @@
 # Graph database - neo4j
 
-from check import *
+from check_existing import *
 import re
 # from pandas import *
 # from calculateQ import *
@@ -14,7 +14,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
                        Qnow=None, Qnow_unit=None,status =repr(status))
 
-    checker = Check(sample_ID, loc, custodian)
+    checker = Check_existing(sample_ID, loc, custodian)
 
     if checker.samples() and len(checker.samples()) >= 1:
 
@@ -31,7 +31,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
         node_sample.update({'Qnow': currQ, 'Qnow_unit': repr(unit)})'''
 
         # Use the checker.py to do the calculation
-        # Notice: for the designated sample id, the result from the quantity calculator in check.py is calculated
+        # Notice: for the designated sample id, the result from the quantity calculator in check_existing.py is calculated
         # from the quantity variations of the sample in all the previous records, excluding the quantity variation
         # in the current record. (i.e. it is the final quantity of the sample until this moment.)
         preQ = checker.quantity_calculator()

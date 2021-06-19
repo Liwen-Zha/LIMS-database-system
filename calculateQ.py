@@ -1,6 +1,4 @@
-
-
-from check import *
+from check_existing import *
 
 graph = Graph("http://localhost:7474", auth=("neo4j", "database_1"))
 
