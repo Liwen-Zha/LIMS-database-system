@@ -57,26 +57,36 @@ def search_command():
 
     search_result = backend_2.search(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
                                 quantity.get(), unit.get(), custodian.get())
+    # Notice: there is second method of designing the search function, see search2() in backend_2.py
+
     if search_result:
-        for row in backend_2.search(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                                quantity.get(), unit.get(), custodian.get()): # now_time):
+        for row in search_result:
             list.insert(END,row)
     else:
         list.insert(END, 'Cannot search records with the entered criteria! Please re-enter.')
         auto_delete()
 
-'''def check_command():
-    ...'''
-
-def view_logs_command():
+def view_logs_command(): # view all the samples' records/logs
     list.delete(0,END)
-    for row in backend_2.view():
+    for row in backend_2.view_logs():
         list.insert(END,row)
 
-def check_samples_command(): # check all the samples current/final status
+def view_samples_command(): # view all the samples' current/final status
     list.delete(0,END)
-    for row in backend_2.check():
+    for row in backend_2.view_samples():
         list.insert(END,row)
+
+def check_command():
+    list.delete(0,END)
+
+    check_result = backend_2.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+                                   custodian.get())
+    if check_result:
+        for row in check_result:
+            list.insert(END,row)
+    else:
+        list.insert(END, 'Cannot check the final status with the entered criteria! Please re-enter.')
+        auto_delete()
 
 
 window = Tk()
@@ -95,18 +105,6 @@ label_sID.grid(row=0,column=2)
 sample_ID = StringVar()
 input_sID = Entry(window, textvariable=sample_ID)
 input_sID.grid(row=0,column=3)
-
-'''label_genealogy = Label(window, text='Genealogy') # sample, subsample
-label_genealogy .grid(row=1,column=0)
-genealogy = StringVar()
-input_genealogy = Entry(window, textvariable=genealogy)
-input_genealogy.grid(row=1,column=1)
-
-label_pID = Label(window, text='Parent ID')
-label_pID .grid(row=1,column=2)
-parent_ID = StringVar()
-input_pID = Entry(window, textvariable=parent_ID)
-input_pID.grid(row=1,column=3)'''
 
 label_loc = Label(window, text='Storage Location')
 label_loc.grid(row=1,column=0)
@@ -161,11 +159,14 @@ button_search.grid(row=5,column=3)
 button_view_logs = Button(window,text='View all logs',width=15,pady=5,command=view_logs_command)
 button_view_logs.grid(row=6,column=3)
 
-button_view_samples = Button(window,text='Check samples',width=15,pady=5,command=check_samples_command)
+button_view_samples = Button(window,text='View all samples',width=15,pady=5,command=view_samples_command)
 button_view_samples.grid(row=7,column=3)
 
+button_check_samples = Button(window,text='Check status',width=15,pady=5,command=check_command)
+button_check_samples.grid(row=8,column=3)
+
 button_close = Button(window,text='Close',width=15,pady=5,command = window.destroy)
-button_close.grid(row=8,column=3)
+button_close.grid(row=9,column=3)
 
 window.mainloop()
 

@@ -1,6 +1,7 @@
 # Graph database - neo4j
 
 from check import *
+import re
 # from pandas import *
 # from calculateQ import *
 
@@ -362,7 +363,7 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
 
 # view all records in the database
 # include all relationships and nodes
-def view():
+def view_logs():
     all_samples = graph.run("MATCH (a: Sample) RETURN a").data()
     global view_all
     view_all = list()
@@ -383,12 +384,14 @@ def view():
         # print(r_where)
         where = r_where.end_node['id']
 
-        print(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
-        view_all.append(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
+        #print(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
+        txt = [who,'operate',str(each_sample),' in freezer: ',where,' at ', who_time ]
+        #view_all.append(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
+        view_all.append(txt)
 
     return view_all
 
-def check():
+def view_samples():
 
     global show_check, all_samples, uni_samples, uni_id, alone_samples, alone_id
     show_check = list()
@@ -433,16 +436,93 @@ def check():
     #print(all_samples)
 
     for each in all_samples:
-        records = graph.run("MATCH (n:Sample)-[r:IN]->(f:Freezer) WHERE id(n) = $s RETURN r",
+        records = graph.run("MATCH (p: Person)-[r1:OPERATE]->(n:Sample)-[r2:IN]->(f:Freezer) WHERE id(n) = $s RETURN r1,r2",
                             s=each.identity).data()
 
         #print(records) # records: list records[0]: dict
-        find_where = list(records[0].values())[0] # r_where: class 'py2neo.data.IN'
+        find_who = list(records[0].values())[0]
+        txt_who = find_who.start_node['name']
+        find_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
         txt_where = find_where.end_node['id']
         #print(where)
 
-        txt = '{} {} of {} in {}'.format(each['Qnow'], each['Qnow_unit'], each['id'], txt_where)
-        # print(txt)
+        #print(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
+        txt = 'Type:{} ID:{} Quantity:{} Unit:{} Location:{} Status:{} latest operated by:{}'.\
+            format(each['type'], each['id'], each['Qnow'], each['Qnow_unit'], txt_where, each['status'], txt_who)
+
+        # second way is to use list to store all the samples' current status
+        # which would be easier for designing the check function (next)
+        '''txt = ['Type:',each['type'],'ID:',each['id'],'Quantity:',each['Qnow'], 'Unit:',each['Qnow_unit'], 
+               'Location:',txt_where, 'Status:',each['status'],'latest operated by:', txt_who]'''
         show_check.append(txt)
 
     return show_check
+
+def check(sample_type, sample_ID, loc, status, custodian):
+    this_input = [sample_type, sample_ID, loc, status, custodian]
+    while '' in this_input:
+        this_input.remove('')
+    # print(this_input)
+    view_samples()
+    global show_check
+    global check_result
+    check_result = list()
+
+    for each in show_check:
+        #print(each)
+        this_type = re.findall(r"Type:'(.+)' ID", each) # this_type = each[1]
+        #print(this_type[0])
+        this_id = re.findall(r"ID:'(.+)' Quantity", each)
+        this_loc = re.findall(r"Location:'(.+)' Status", each)
+        this_sta = re.findall(r"Status:'(.+)' latest", each)
+        this_who = re.findall(r"latest operated by:'(.+)'", each)
+        this_element = [this_type[0], this_id[0], this_loc[0], this_sta[0], this_who[0]]
+
+        if set(this_input) < set(this_element):
+            check_result.append(each)
+        else:
+            continue
+
+    return check_result
+
+# second method of designing the search function
+def search2(sample_type, sample_ID, loc, status, Q, unit, custodian):
+    this_search = [sample_type, sample_ID, loc, status, Q, unit, custodian]
+    while '' in this_search:
+        this_search.remove('')
+
+    view_logs()
+    global view_all
+    global search_result
+    search_result = list()
+
+    for each in view_all:
+        print(each)
+        this_type = each[0]
+        # this way is similar to the check function
+        # firstly, call the view_logs() funciton, get all the logs in the system
+        # secondly, check each log if the entered criteria match the keywords of the logs
+        # thirdly, store the matched logs and return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
