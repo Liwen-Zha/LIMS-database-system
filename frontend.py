@@ -1,10 +1,12 @@
-# This version of the project focuses on the backend design.
-# Backend: neo4j database (later will be integrated into the Flask framework)
-# Frontend: tkinter module
-
 from tkinter import *
 import time
-import backend_2
+import backend
+
+'''
+  frontend.py:
+  This file uses tkinter package in python to develop a simple version of the frontend.
+  It can also be considered as a 'test file' of the backend development. 
+'''
 
 def get_selected_data(event):
     global selected_row
@@ -43,8 +45,8 @@ def get_time():
     window.after(500, get_time)
 
 def add_command():
-    backend_2.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                     quantity.get(), unit.get(), custodian.get(), now_time)
+    backend.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+                   quantity.get(), unit.get(), custodian.get(), now_time)
 
     list.delete(0,END)
     list.insert(END,(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
@@ -55,8 +57,8 @@ def add_command():
 def search_command():
     list.delete(0,END)
 
-    search_result = backend_2.search(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                                quantity.get(), unit.get(), custodian.get())
+    search_result = backend.search_improved(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+                                   quantity.get(), unit.get(), custodian.get())
     # Notice: there is second method of designing the search function, see search2() in backend_2.py
 
     if search_result:
@@ -68,19 +70,19 @@ def search_command():
 
 def view_logs_command(): # view all the samples' records/logs
     list.delete(0,END)
-    for row in backend_2.view_logs():
+    for row in backend.view_logs():
         list.insert(END,row)
 
 def view_samples_command(): # view all the samples' current/final status
     list.delete(0,END)
-    for row in backend_2.view_samples():
+    for row in backend.view_samples():
         list.insert(END,row)
 
 def check_command():
     list.delete(0,END)
 
-    check_result = backend_2.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                                   custodian.get())
+    check_result = backend.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+                                 custodian.get())
     if check_result:
         for row in check_result:
             list.insert(END,row)

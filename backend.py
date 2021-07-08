@@ -1,42 +1,54 @@
-# Graph database - neo4j
-
-from check_existing import *
+from tools import *
 import re
-# from pandas import *
-# from calculateQ import *
 
-graph = Graph("http://localhost:7474", auth=("neo4j", "database_1"))
-# graph.delete_all()
+'''
+  backend.py:
+  This file is the core module of the system, including different functions required for the LIMS.
+  It will be used in the Flask framework to complete the backend design.
+'''
+
+NEO4j_URL= "http://localhost:7474"
+NEO4j_USERNAME = "neo4j"
+NEO4j_PASSWORD = "database_1"
+graph = Graph(NEO4j_URL, auth=(NEO4j_USERNAME, NEO4j_PASSWORD))
 
 def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
+    '''
+    Log the sample transaction into the database.
 
+    keyword arguments:
+    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
+    sample_ID -- the identification number of the sample (e.g., blo0001)
+    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
+    status -- the status of the sample, including available, in use and booked.
+    Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
+    unit -- the unit of Q (e.g., ml, tube, plate)
+    custodian -- the custodian of the sample transaction （e.g., peter, linda)
+    time -- the occurrence time of the sample transaction
+    '''
     node_sample = Node('Sample', type=repr(sample_type), id=repr(sample_ID),
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
                        Qnow=None, Qnow_unit=None,status =repr(status))
 
-    checker = Check_existing(sample_ID, loc, custodian)
+    check_existence = existenceChecker(sample_ID, loc, custodian)
 
-    if checker.samples() and len(checker.samples()) >= 1:
+    if check_existence.check_existing_samples() and len(check_existence.check_existing_samples()) >= 1:
 
-        node_pre_sample = checker.last_sample().first()
-        node_1st_sample = checker.first_sample()
+        find_samples = sampleFinder(sample_ID)
+
+        node_pre_sample = find_samples.find_last_sample()
+        node_1st_sample = find_samples.find_first_sample()
         update_Qinit = node_1st_sample['Qinit']
         update_Qinit_unit = node_1st_sample['Qinit_unit']
         node_sample.update({'Qinit': float(update_Qinit), 'Qinit_unit': update_Qinit_unit})
 
-        # If use calculateQ.py to do the calculation, then:
-        '''cal = Calculator(sample_ID)
-        preQ = cal.quantity_up_to_now()
-        currQ = preQ + float(Q)
-        node_sample.update({'Qnow': currQ, 'Qnow_unit': repr(unit)})'''
-
-        # Use the checker.py to do the calculation
-        # Notice: for the designated sample id, the result from the quantity calculator in check_existing.py is calculated
-        # from the quantity variations of the sample in all the previous records, excluding the quantity variation
-        # in the current record. (i.e. it is the final quantity of the sample until this moment.)
-        preQ = checker.quantity_calculator()
-        currQ = preQ + float(Q)
-        node_sample.update({'Qnow': float(currQ), 'Qnow_unit': repr(unit)})
+        # Use the class quantityCalculator() in tools.py to calculate the current quantity of the sample.
+        # Notice: for each sample id, the result of quantityCalculator() is the sum of all previous quantity variations
+        # of the sample, which means it excludes the quantity variation of the current sample transaction.
+        calculate_quantity = quantityCalculator(sample_ID)
+        previous_quantity = calculate_quantity.calculate_quantity_variations()
+        current_quantity = previous_quantity + float(Q)
+        node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})
 
         properties1={'at': repr(time)}
         rel_child_of = Relationship(node_pre_sample, 'QUANTITY_CHANGE', node_sample, **properties1)
@@ -47,13 +59,13 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
         node_sample.update({'Qinit': float(Q), 'Qinit_unit': repr(unit)})
         node_sample.update({'Qnow': float(Q), 'Qnow_unit': repr(unit)})
 
-    if checker.freezers():
-        node_freezer = checker.freezers().first()
+    if check_existence.check_existing_freezers():
+        node_freezer = check_existence.check_existing_freezers().first()
     else:
         node_freezer = Node('Freezer', id=repr(loc))
 
-    if checker.persons():
-        node_custodian = checker.persons().first()
+    if check_existence.check_existing_persons():
+        node_custodian = check_existence.check_existing_persons().first()
     else:
         node_custodian = Node('Person', name=repr(custodian))
 
@@ -67,29 +79,19 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
     graph.create(s2)
 
 def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
-    '''nodes = NodeMatcher(graph)
-    search_samples = nodes.match("Sample", type=repr(sample_type)).all()
-    print(search_samples)
-    return(list(search_samples))'''
+    '''
+    Search the sample transaction in the database.
 
-    # .evaluate() returns first matched node in node type
-    # .data() returns all matched nodes in list of dictionaries
-
-    # get all searched sample nodes
-    '''if sample_type or sample_ID or status:
-        if sample_type and sample_ID:
-            nodes= graph.run("MATCH (a) WHERE a.type=$x1 AND a.id=$x2 RETURN a",
-                     x1=repr(sample_type), x2=repr(sample_ID)).data()
-        else:
-            nodes= graph.run("MATCH (a) WHERE a.type=$x1 OR a.id=$x2 RETURN a",
-                     x1=repr(sample_type), x2=repr(sample_ID)).data()
-    
-    else:
-        alert["enter_sample"] = 0'''
-
-    global search_samples
-    global search_loc
-    global search_people
+    keyword arguments:
+    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
+    sample_ID -- the identification number of the sample (e.g., blo0001)
+    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
+    status -- the status of the sample, including available, in use and booked.
+    Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
+    unit -- the unit of Q (e.g., ml, tube, plate)
+    custodian -- the custodian of the sample transaction （e.g., peter, linda)
+    time -- the occurrence time of the sample transaction
+    '''
     if sample_type:
         nodes1 = graph.run("MATCH (a) WHERE a.type=$x RETURN a", x=repr(sample_type)).data()
         search_samples = nodes1
@@ -254,46 +256,25 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
         search_people = []
         print('Cannot search custodians with the custodian id')
 
-
-    # test
-    #print(search_samples)
-    #n = list(search_samples[0].values())
-    #print(n[0])
-    #print(type(n[0]))   # gives the node
-    #print(search_loc)
-    #print(search_people)
-
-    global show_search, r_sample, r_loc, r_people
     show_search = list()
     r_sample = list()
     r_loc = list()
     r_people = list()
 
     for each in search_samples:
-
-        each_node = list(each.values())[0] # each_node: class 'py2neo.data.Node'
-        # print(list(each_node.items()))
-        # print(dict(each_node)) #----use this
-        # show_s_type = list(each_node.values())[7]
-        # return all the records related to certain sample
+        each_node = list(each.values())[0]
         records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
                             "WHERE id(n) = $s RETURN r1,r2", s=each_node.identity).data()
 
-        # print(records) # records: list records[0]: dict
-        r_who = list(records[0].values())[0] # r_who: class 'py2neo.data.OPERATE'
-        # print(r_who)
-        who = r_who.start_node['name']  #r_who.start_node['name']: str
-        # show_rel = r_who.type('OPERATE').__name__ # return str
-        who_time = list(r_who.values())[0] # return str
+        r_who = list(records[0].values())[0]
+        who = r_who.start_node['name']
+        who_time = list(r_who.values())[0]
 
-        r_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
-        # print(r_where)
+        r_where = list(records[0].values())[1]
         where = r_where.end_node['id']
 
         print(who + ' operate ' + str(each_node) + ' in freezer: ' + where + ' at ' + who_time)
         r_sample.append(who + ' operate ' + str(each_node) + ' in freezer: ' + where + ' at ' + who_time)
-        '''records2 = graph.run("MATCH (s1:Sample)-[r:QUANTITY_CHANGE]->(s2:Sample) "
-                      "WHERE s2.id = $s RETURN r", s=each_node['id']).data()'''
 
     for each in search_loc:
         each_loc = list(each.values())[0]
@@ -301,18 +282,16 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
                                 "WHERE id(f) = $s RETURN n", s=each_loc.identity).data()
 
         for each in loc_records:
-            #print(each)
-            each_node = list(each.values())[0] # each_node: class 'py2neo.data.Node'
-            # print(each_node.identity)
+            each_node = list(each.values())[0]
 
             records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
                                 "WHERE id(n) = $s AND id(f) = $m RETURN r1,r2,n",
                                 s=each_node.identity, m=each_loc.identity ).data()
-            # print(records)
-            r_who = list(records[0].values())[0] # r_who: class 'py2neo.data.OPERATE'
-            who = r_who.start_node['name']  #r_who.start_node['name']: str
-            who_time = list(r_who.values())[0] # return str
-            r_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
+
+            r_who = list(records[0].values())[0]
+            who = r_who.start_node['name']
+            who_time = list(r_who.values())[0]
+            r_where = list(records[0].values())[1]
             where = r_where.end_node['id']
 
             print(who + ' operate ' + str(each_node) + ' in freezer: ' + where + ' at ' + who_time)
@@ -324,15 +303,15 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
                                    "WHERE id(p) = $s RETURN n", s=each_people.identity).data()
 
         for each in people_records:
-            each_node = list(each.values())[0] # each_node: class 'py2neo.data.Node'
+            each_node = list(each.values())[0]
             records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
                                 "WHERE id(n) = $s AND id(p) = $u RETURN r1,r2",
                                 s=each_node.identity, u=each_people.identity).data()
 
-            r_who = list(records[0].values())[0] # r_who: class 'py2neo.data.OPERATE'
-            who = r_who.start_node['name']  #r_who.start_node['name']: str
-            who_time = list(r_who.values())[0] # return str
-            r_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
+            r_who = list(records[0].values())[0]
+            who = r_who.start_node['name']
+            who_time = list(r_who.values())[0]
+            r_where = list(records[0].values())[1]
             where = r_where.end_node['id']
 
             print(who + ' operate ' + str(each_node) + ' in freezer: ' + where + ' at ' + who_time)
@@ -361,41 +340,34 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
         print('NO MATCHED RECORDS!')
         return False
 
-# view all records in the database
-# include all relationships and nodes
 def view_logs():
+    '''
+    View all sample transactions in the database.
+    '''
     all_samples = graph.run("MATCH (a: Sample) RETURN a").data()
-    global view_all
     view_all = list()
     for each in all_samples:
-
-        each_sample = list(each.values())[0] # each_node: class 'py2neo.data.Node'
+        each_sample = list(each.values())[0]
         records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
                             "WHERE id(n) = $s RETURN r1,r2", s=each_sample.identity).data()
 
-        # print(records) # records: list records[0]: dict
-        r_who = list(records[0].values())[0] # r_who: class 'py2neo.data.OPERATE'
-        # print(r_who)
-        who = r_who.start_node['name']  #r_who.start_node['name']: str
-        # show_rel = r_who.type('OPERATE').__name__ # return str
-        who_time = list(r_who.values())[0] # return str
+        r_who = list(records[0].values())[0]
+        who = r_who.start_node['name']
+        who_time = list(r_who.values())[0]
 
-        r_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
-        # print(r_where)
+        r_where = list(records[0].values())[1]
         where = r_where.end_node['id']
 
-        #print(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
         txt = [who,'operate',str(each_sample),' in freezer: ',where,' at ', who_time ]
-        #view_all.append(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
         view_all.append(txt)
 
     return view_all
 
 def view_samples():
-
-    global show_check, all_samples, uni_samples, uni_id, alone_samples, alone_id
+    '''
+    View all samples registered in the database.
+    '''
     show_check = list()
-    all_samples = list()
     uni_id = list()
     uni_samples = list()
     alone_samples = list()
@@ -403,7 +375,6 @@ def view_samples():
 
     final_sample = graph.run("MATCH (s0: Sample)-[r: QUANTITY_CHANGE]-> (s1:Sample) RETURN s1").data()
 
-    # each node type in final_sample is expressed in: list(final_sample[0].values())[0]  first 0 ->1,2,3
     init_id = list(final_sample[0].values())[0]['id']
     uni_id.append(init_id)
     uni_samples.append(list(final_sample[0].values())[0])
@@ -417,9 +388,6 @@ def view_samples():
             id_index = uni_id.index(each_sid)
             uni_samples[id_index] = each_node
 
-    #print(uni_id)
-    #print(uni_samples)
-
     sample_nodes = graph.run("MATCH (a: Sample) RETURN a").data()
     for each in sample_nodes:
         every_node = list(each.values())[0]
@@ -428,50 +396,46 @@ def view_samples():
             alone_samples.append(every_node)
             alone_id.append(every_sid)
 
-    #print(alone_samples)
-    #print(alone_id)
-    #print(uni_id)
-
     all_samples = uni_samples + alone_samples
-    #print(all_samples)
 
     for each in all_samples:
         records = graph.run("MATCH (p: Person)-[r1:OPERATE]->(n:Sample)-[r2:IN]->(f:Freezer) WHERE id(n) = $s RETURN r1,r2",
                             s=each.identity).data()
 
-        #print(records) # records: list records[0]: dict
         find_who = list(records[0].values())[0]
         txt_who = find_who.start_node['name']
-        find_where = list(records[0].values())[1] # r_where: class 'py2neo.data.IN'
+        find_where = list(records[0].values())[1]
         txt_where = find_where.end_node['id']
-        #print(where)
 
-        #print(who + ' operate ' + str(each_sample) + ' in freezer: ' + where + ' at ' + who_time)
         txt = 'Type:{} ID:{} Quantity:{} Unit:{} Location:{} Status:{} latest operated by:{}'.\
             format(each['type'], each['id'], each['Qnow'], each['Qnow_unit'], txt_where, each['status'], txt_who)
 
-        # second way is to use list to store all the samples' current status
-        # which would be easier for designing the check function (next)
-        '''txt = ['Type:',each['type'],'ID:',each['id'],'Quantity:',each['Qnow'], 'Unit:',each['Qnow_unit'], 
-               'Location:',txt_where, 'Status:',each['status'],'latest operated by:', txt_who]'''
         show_check.append(txt)
 
     return show_check
 
 def check(sample_type, sample_ID, loc, status, custodian):
+    '''
+    Check: 1. the latest information of certain sample
+           2. the contents in certain freezer
+           3. the samples managed by certain custodian
+
+    keyword arguments:
+    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
+    sample_ID -- the identification number of the sample (e.g., blo0001)
+    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
+    status -- the status of the sample, including available, in use and booked.
+    custodian -- the custodian of the sample transaction （e.g., peter, linda)
+    '''
     this_input = [sample_type, sample_ID, loc, status, custodian]
     while '' in this_input:
         this_input.remove('')
-    # print(this_input)
-    view_samples()
-    global show_check
-    global check_result
+
+    show_check = view_samples()
     check_result = list()
 
     for each in show_check:
-        #print(each)
-        this_type = re.findall(r"Type:'(.+)' ID", each) # this_type = each[1]
-        #print(this_type[0])
+        this_type = re.findall(r"Type:'(.+)' ID", each)
         this_id = re.findall(r"ID:'(.+)' Quantity", each)
         this_loc = re.findall(r"Location:'(.+)' Status", each)
         this_sta = re.findall(r"Status:'(.+)' latest", each)
@@ -485,24 +449,49 @@ def check(sample_type, sample_ID, loc, status, custodian):
 
     return check_result
 
-# second method of designing the search function
-def search2(sample_type, sample_ID, loc, status, Q, unit, custodian):
+def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
+    '''
+    This function is simpler compared with search(sample_type, sample_ID, loc, status, Q, unit, custodian).
+    The method is similar to the design of the check function.
+    Firstly, call the view_logs() function, get all the logs in the database;
+    Secondly, check if the entered criteria match the keywords of each log;
+    Thirdly, store all the matched logs and return them.
+
+    keyword arguments:
+    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
+    sample_ID -- the identification number of the sample (e.g., blo0001)
+    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
+    status -- the status of the sample, including available, in use and booked.
+    Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
+    unit -- the unit of Q (e.g., ml, tube, plate)
+    custodian -- the custodian of the sample transaction （e.g., peter, linda)
+    '''
     this_search = [sample_type, sample_ID, loc, status, Q, unit, custodian]
     while '' in this_search:
         this_search.remove('')
 
-    view_logs()
-    global view_all
-    global search_result
+    search_all = view_logs()
     search_result = list()
 
-    for each in view_all:
-        print(each)
-        this_type = each[0]
-        # this way is similar to the check function
-        # firstly, call the view_logs() funciton, get all the logs in the system
-        # secondly, check each log if the entered criteria match the keywords of the logs
-        # thirdly, store the matched logs and return
+    for each in search_all:
+        this_sample = each[2]
+        this_type = re.findall(r'type: "(.+?)"', this_sample)
+        this_id = re.findall(r'id: "([^"]+)", status', this_sample)
+        this_loc = each[4]
+        this_status = re.findall(r'status: "([^"]+)", type', this_sample)
+        this_q = re.findall(r'Qvar: (.+), Qvar_unit', this_sample)
+        this_unit = re.findall(r'Qvar_unit: "([^"]+)", id', this_sample)
+        this_who = each[0]
+        this_all = [this_type[0][1:-1], this_id[0][1:-1], this_loc[1:-1], this_status[0][1:-1],
+                    this_q[0][1:-1], this_unit[0][1:-1], this_who[1:-1]]
+
+        if set(this_search) < set(this_all):
+            search_result.append(each)
+        else:
+            continue
+
+    return search_result
+
 
 
 
