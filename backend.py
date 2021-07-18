@@ -1,5 +1,6 @@
 from tools import *
 import re
+import time
 
 '''
   backend.py:
@@ -491,6 +492,19 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
             continue
 
     return search_result
+
+def get_time():
+    '''
+    Get the current time in 'date/month/year - hour:minute:second' format.
+    '''
+    now_time = time.strftime('%d/%m/%Y - %H:%M:%S',time.localtime(time.time()))
+    return now_time
+
+def ttttt():
+    print('Yeah')
+
+
+
 
 
 

@@ -1,5 +1,4 @@
 from tkinter import *
-import time
 import backend
 
 '''
@@ -7,6 +6,10 @@ import backend
   This file uses tkinter package in python to develop a simple version of the frontend.
   It can also be considered as a 'test file' of the backend development. 
 '''
+def get_time():
+    now_time = backend.get_time()
+    show_time.configure(text=now_time)
+    window.after(500, get_time)
 
 def get_selected_data(event):
     global selected_row
@@ -37,20 +40,13 @@ def auto_delete():
     input_unit.delete(0,END)  
     input_custodian.delete(0,END)
 
-now_time = ''
-def get_time():
-    global now_time
-    now_time = time.strftime('%d/%m/%Y - %H:%M:%S',time.localtime(time.time()))
-    show_time.configure(text=now_time)
-    window.after(500, get_time)
-
 def add_command():
     backend.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                   quantity.get(), unit.get(), custodian.get(), now_time)
+                   quantity.get(), unit.get(), custodian.get(), backend.get_time())
 
     list.delete(0,END)
     list.insert(END,(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                     quantity.get(), unit.get(), custodian.get(), 'Date & time:' + now_time))
+                     quantity.get(), unit.get(), custodian.get(), 'Date & time:' + backend.get_time()))
 
     auto_delete()
 
