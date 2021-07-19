@@ -45,7 +45,7 @@ if __name__ == "__main__":
     print(test_check)
 
     print('Test result of search_improved():')
-    test_search_improved = backend.search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian)
-    print(test_search_improved)
+    test_search_improve = backend.search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian)
+    print(test_search_improve)
 
 
