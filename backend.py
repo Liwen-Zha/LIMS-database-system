@@ -13,6 +13,13 @@ NEO4j_USERNAME = "neo4j"
 NEO4j_PASSWORD = "database_1"
 graph = Graph(NEO4j_URL, auth=(NEO4j_USERNAME, NEO4j_PASSWORD))
 
+def get_time():
+    '''
+    Get the current time in 'date/month/year - hour:minute:second' format.
+    '''
+    now_time = time.strftime('%d/%m/%Y - %H:%M:%S',time.localtime(time.time()))
+    return now_time
+
 def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
     '''
     Log the sample transaction into the database.
@@ -78,6 +85,8 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
     rel_record = Relationship(node_custodian,'OPERATE',node_sample, **properties2)
     s2 = node_custodian | node_sample | rel_record
     graph.create(s2)
+
+    return True
 
 def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
     '''
@@ -493,15 +502,9 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
 
     return search_result
 
-def get_time():
-    '''
-    Get the current time in 'date/month/year - hour:minute:second' format.
-    '''
-    now_time = time.strftime('%d/%m/%Y - %H:%M:%S',time.localtime(time.time()))
-    return now_time
 
-def ttttt():
-    print('Yeah')
+
+
 
 
 
