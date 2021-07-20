@@ -53,9 +53,11 @@ def add_command():
 def search_command():
     list.delete(0,END)
 
-    search_result = backend.search_improved(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                                   quantity.get(), unit.get(), custodian.get())
-    # Notice: there is second method of designing the search function, see search2() in backend_2.py
+    search_result = backend.search_improved(sample_type.get(), sample_ID.get(),
+                                            storage_loc.get(), status.get(),
+                                            quantity.get(), unit.get(),
+                                            custodian.get())
+    # Notice: there is a second method of designing the search function, see search() in backend.py
 
     if search_result:
         for row in search_result:

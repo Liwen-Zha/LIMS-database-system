@@ -20,32 +20,45 @@ if __name__ == "__main__":
     # 2. Use hash mark (#) or triple quotes (''') to comment the following test cases
     print('Test result of get_time():')
     test_time = backend.get_time()
-    print(test_time)
-
-    print('Test result of insert():')
-    if backend.insert(sample_type, sample_ID, loc, status, Q, unit, custodian, test_time):
-        print('Done')
+    if test_time:
+        print(test_time)
     else:
-        print('Failed')
+        print('no test_time')
 
-    print('Test result of search():')
-    test_search = backend.search(sample_type, sample_ID, loc, status, Q, unit, custodian)
-    print(test_search)
+    print('\nTest result of insert():')
+    if backend.insert(sample_type, sample_ID, loc, status, Q, unit, custodian, test_time):
+        print('Insert Done')
+    else:
+        print('Insert Failed')
 
-    print('Test result of view_logs():')
+    print('\nTest result of view_logs():')
     test_view_logs = backend.view_logs()
-    print(test_view_logs)
+    if test_view_logs:
+        for each in test_view_logs:
+            print(each)
+    else:
+        print('no test_view_logs')
 
-    print('Test result of view_samples():')
+    print('\nTest result of view_samples():')
     test_view_samples = backend.view_samples()
-    print(test_view_samples)
+    if test_view_samples:
+        for each in test_view_samples:
+            print(each)
+    else:
+        print('no test_view_samples')
 
-    print('Test result of check():')
+    print('\nTest result of check():')
     test_check = backend.check(sample_type, sample_ID, loc, status, custodian)
-    print(test_check)
+    if test_check:
+        print(test_check)
+    else:
+        print('no test_result')
 
-    print('Test result of search_improved():')
-    test_search_improve = backend.search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian)
-    print(test_search_improve)
+    print('\nTest result of search_improved():')
+    test_search_improved = backend.search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian)
+    if test_search_improved:
+        print(test_search_improved)
+    else:
+        print('no test_search_improved')
 
 

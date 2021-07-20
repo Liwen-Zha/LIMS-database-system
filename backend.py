@@ -452,7 +452,7 @@ def check(sample_type, sample_ID, loc, status, custodian):
         this_who = re.findall(r"latest operated by:'(.+)'", each)
         this_element = [this_type[0], this_id[0], this_loc[0], this_sta[0], this_who[0]]
 
-        if set(this_input) < set(this_element):
+        if set(this_input) <= set(this_element):
             check_result.append(each)
         else:
             continue
@@ -493,9 +493,9 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
         this_unit = re.findall(r'Qvar_unit: "([^"]+)", id', this_sample)
         this_who = each[0]
         this_all = [this_type[0][1:-1], this_id[0][1:-1], this_loc[1:-1], this_status[0][1:-1],
-                    this_q[0][1:-1], this_unit[0][1:-1], this_who[1:-1]]
+                    this_q[0], this_unit[0][1:-1], this_who[1:-1]]
 
-        if set(this_search) < set(this_all):
+        if set(this_search) <= set(this_all):
             search_result.append(each)
         else:
             continue
