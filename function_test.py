@@ -13,7 +13,7 @@ if __name__ == "__main__":
     sample_ID = 't002'
     loc = 'test_f1'
     status = 'ok'
-    Q = 10
+    Q = 20
     unit = 'ml'
     custodian = 'tester'
 
