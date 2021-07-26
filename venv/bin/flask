@@ -1,4 +1,4 @@
-#!/Users/zlw/Desktop/LIMS-database-system/venv/bin/python
+#!/Users/zlw/Desktop/LIMS-database-system/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

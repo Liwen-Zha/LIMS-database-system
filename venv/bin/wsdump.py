@@ -1,4 +1,4 @@
-#!/Users/zlw/Desktop/LIMS/database-system/venv/bin/python
+#!/Users/zlw/Desktop/LIMS-database-system/venv/bin/python
 
 """
 websocket - WebSocket client library for Python
