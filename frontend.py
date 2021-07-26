@@ -42,7 +42,7 @@ def auto_delete():
 
 def add_command():
     backend.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                   quantity.get(), unit.get(), custodian.get(), backend.get_time())
+                   quantity.get(), unit.get(), custodian.get())
 
     list.delete(0,END)
     list.insert(END,(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),

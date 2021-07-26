@@ -20,7 +20,7 @@ def get_time():
     now_time = time.strftime('%d/%m/%Y - %H:%M:%S',time.localtime(time.time()))
     return now_time
 
-def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
+def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
     '''
     Log the sample transaction into the database.
 
@@ -32,7 +32,6 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
     Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
     unit -- the unit of Q (e.g., ml, tube, plate)
     custodian -- the custodian of the sample transaction （e.g., peter, linda)
-    time -- the occurrence time of the sample transaction
     '''
     node_sample = Node('Sample', type=repr(sample_type), id=repr(sample_ID),
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
@@ -58,6 +57,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
         current_quantity = previous_quantity + float(Q)
         node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})
 
+        time = get_time()
         properties1={'at': repr(time)}
         rel_child_of = Relationship(node_pre_sample, 'QUANTITY_CHANGE', node_sample, **properties1)
         s0 = node_pre_sample | node_sample | rel_child_of
@@ -81,6 +81,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian, time):
     s1 = node_sample | node_freezer | rel_in
     graph.create(s1)
 
+    time = get_time()
     properties2={'at': repr(time)}
     rel_record = Relationship(node_custodian,'OPERATE',node_sample, **properties2)
     s2 = node_custodian | node_sample | rel_record
@@ -100,7 +101,6 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
     Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
     unit -- the unit of Q (e.g., ml, tube, plate)
     custodian -- the custodian of the sample transaction （e.g., peter, linda)
-    time -- the occurrence time of the sample transaction
     '''
     if sample_type:
         nodes1 = graph.run("MATCH (a) WHERE a.type=$x RETURN a", x=repr(sample_type)).data()
