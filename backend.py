@@ -51,7 +51,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
 
         # Use the class quantityCalculator() in tools.py to calculate the current quantity of the sample.
         # Notice: for each sample id, the result of quantityCalculator() is the sum of all previous quantity variations
-        # of the sample, which means it excludes the quantity variation of the current sample transaction.
+        #         of the sample, which means it excludes the quantity variation of the current sample transaction.
         calculate_quantity = quantityCalculator(sample_ID)
         previous_quantity = calculate_quantity.calculate_quantity_variations()
         current_quantity = previous_quantity + float(Q)
@@ -108,7 +108,7 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
         if nodes1 and sample_ID:
             nodes2 = []
             for n1 in nodes1:
-                if n1['id'] == sample_ID:
+                if n1['a']['id'][1:-1] == sample_ID:
                     nodes2.append(n1)
                 else:
                     continue
@@ -350,6 +350,49 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
         print('NO MATCHED RECORDS!')
         return False
 
+def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
+    '''
+    This function is simpler compared with search(sample_type, sample_ID, loc, status, Q, unit, custodian).
+    The method is similar to the design of the check function.
+    Firstly, call the view_logs() function, get all the logs in the database;
+    Secondly, check if the entered criteria match the keywords of each log;
+    Thirdly, store all the matched logs and return them.
+
+    keyword arguments:
+    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
+    sample_ID -- the identification number of the sample (e.g., blo0001)
+    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
+    status -- the status of the sample, including available, in use and booked.
+    Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
+    unit -- the unit of Q (e.g., ml, tube, plate)
+    custodian -- the custodian of the sample transaction （e.g., peter, linda)
+    '''
+    this_search = [sample_type, sample_ID, loc, status, Q, unit, custodian]
+    while '' in this_search:
+        this_search.remove('')
+
+    search_all = view_logs()
+    search_result = list()
+
+    for each in search_all:
+        this_sample = each[2]
+        this_type = re.findall(r'type: "(.+?)"', this_sample)
+        this_id = re.findall(r'id: "([^"]+)", status', this_sample)
+        this_loc = each[4]
+        this_status = re.findall(r'status: "([^"]+)", type', this_sample)
+        this_q = re.findall(r'Qvar: (.+), Qvar_unit', this_sample)
+        this_unit = re.findall(r'Qvar_unit: "([^"]+)", id', this_sample)
+        this_who = each[0]
+        this_all = [this_type[0][1:-1], this_id[0][1:-1], this_loc[1:-1], this_status[0][1:-1],
+                    this_q[0], this_unit[0][1:-1], this_who[1:-1]]
+
+        if set(this_search) <= set(this_all):
+            search_result.append(each)
+        else:
+            continue
+
+    return search_result
+
 def view_logs():
     '''
     View all sample transactions in the database.
@@ -458,49 +501,6 @@ def check(sample_type, sample_ID, loc, status, custodian):
             continue
 
     return check_result
-
-def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
-    '''
-    This function is simpler compared with search(sample_type, sample_ID, loc, status, Q, unit, custodian).
-    The method is similar to the design of the check function.
-    Firstly, call the view_logs() function, get all the logs in the database;
-    Secondly, check if the entered criteria match the keywords of each log;
-    Thirdly, store all the matched logs and return them.
-
-    keyword arguments:
-    sample_type -- the type of the sample (e.g., blood, DNA, RNA)
-    sample_ID -- the identification number of the sample (e.g., blo0001)
-    loc -- the physical location (i.e., the freezer) of the sample (e.g., f1)
-    status -- the status of the sample, including available, in use and booked.
-    Q -- the quantity variation of the sample (e.g., 10, -5, +2.1)
-    unit -- the unit of Q (e.g., ml, tube, plate)
-    custodian -- the custodian of the sample transaction （e.g., peter, linda)
-    '''
-    this_search = [sample_type, sample_ID, loc, status, Q, unit, custodian]
-    while '' in this_search:
-        this_search.remove('')
-
-    search_all = view_logs()
-    search_result = list()
-
-    for each in search_all:
-        this_sample = each[2]
-        this_type = re.findall(r'type: "(.+?)"', this_sample)
-        this_id = re.findall(r'id: "([^"]+)", status', this_sample)
-        this_loc = each[4]
-        this_status = re.findall(r'status: "([^"]+)", type', this_sample)
-        this_q = re.findall(r'Qvar: (.+), Qvar_unit', this_sample)
-        this_unit = re.findall(r'Qvar_unit: "([^"]+)", id', this_sample)
-        this_who = each[0]
-        this_all = [this_type[0][1:-1], this_id[0][1:-1], this_loc[1:-1], this_status[0][1:-1],
-                    this_q[0], this_unit[0][1:-1], this_who[1:-1]]
-
-        if set(this_search) <= set(this_all):
-            search_result.append(each)
-        else:
-            continue
-
-    return search_result
 
 
 

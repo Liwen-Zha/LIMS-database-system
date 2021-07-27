@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request
 import backend
 
 app = Flask(__name__)
@@ -7,22 +7,26 @@ app = Flask(__name__)
 def home():
     return '<h1>Start Page</h1>'
 
-# Register sample
-@app.route('/sample-registration', methods=['POST'])
-def register_sample():
+@app.route('/sample-log', methods=['POST'])
+def log_sample():
+    '''
+    Log sample transaction
+    '''
     dict_value = request.get_json()
     json_value = jsonify(dict_value)
     new_sample = backend.insert(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
                                 dict_value['status'], dict_value['Q'], dict_value['unit'],
                                 dict_value['custodian'])
     if new_sample:
-        return 'Successfully added {} to the database.'.format(dict_value['sample_ID'])
+        return 'Successfully added {} to the database.'.format(json_value)
     else:
         return jsonify({"errorMsg": "Failed add sample"}), 400
 
-# Search sample
 @app.route('/sample-search', methods = ["POST"])
 def search_sample():
+    '''
+    Search sample records
+    '''
     dict_value = request.get_json()
     searched_sample = backend.search_improved(dict_value['sample_type'], dict_value['sample_ID'],
                                               dict_value['loc'],dict_value['status'],
@@ -34,9 +38,12 @@ def search_sample():
     else:
         return jsonify({"errorMsg": "Failed search sample"}), 400
 
-# View all sample logs
 @app.route('/all-logs', methods = ["GET"])
 def view_logs():
+    '''
+    View all sample records
+    i.e., view all transactions stored in the database
+    '''
     all_logs = backend.view_logs()
 
     if all_logs:
@@ -44,9 +51,12 @@ def view_logs():
     else:
         return jsonify({"errorMsg": "Failed view the logbook"}), 400
 
-# View all samples
 @app.route('/all-samples', methods = ["GET"])
 def view_samples():
+    '''
+    View all samples
+    i.e., view all samples' latest profile
+    '''
     all_samples = backend.view_samples()
 
     if all_samples:
@@ -54,9 +64,14 @@ def view_samples():
     else:
         return jsonify({"errorMsg": "Failed view all samples"}), 400
 
-# Check the latest info of certain sample/freezer/custodian
 @app.route('/check', methods = ["POST"])
 def check_db():
+    '''
+    Check the current status of certain sample/freezer/custodian
+    i.e., check the latest profile of certain sample;
+          check the content in certain freezer;
+          check the sample(s) operated by certain custodian
+    '''
     dict_value = request.get_json()
     checked_data = backend.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
                                  dict_value['status'], dict_value['custodian'])

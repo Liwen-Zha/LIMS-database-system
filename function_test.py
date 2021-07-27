@@ -61,4 +61,11 @@ if __name__ == "__main__":
     else:
         print('no test_search_improved')
 
+    print('\nTest result of search():')
+    test_search = backend.search(sample_type, sample_ID, loc, status, Q, unit, custodian)
+    if test_search:
+        print(test_search)
+    else:
+        print('no test_search')
+
 
