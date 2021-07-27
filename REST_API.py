@@ -18,7 +18,7 @@ def log_sample():
                                 dict_value['status'], dict_value['Q'], dict_value['unit'],
                                 dict_value['custodian'])
     if new_sample:
-        return 'Successfully added {} to the database.'.format(json_value)
+        return json_value
     else:
         return jsonify({"errorMsg": "Failed add sample"}), 400
 
