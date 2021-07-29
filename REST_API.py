@@ -12,11 +12,15 @@ def log_sample():
     '''
     Log sample transaction
     '''
+
+    # Here dict_value is 'dict'; json_value is 'flask.wrappers.Response'
     dict_value = request.get_json()
     json_value = jsonify(dict_value)
+
     new_sample = backend.insert(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
                                 dict_value['status'], dict_value['Q'], dict_value['unit'],
                                 dict_value['custodian'])
+
     if new_sample:
         return json_value
     else:
@@ -31,9 +35,10 @@ def search_sample():
     searched_sample = backend.search_improved(dict_value['sample_type'], dict_value['sample_ID'],
                                               dict_value['loc'],dict_value['status'],
                                               dict_value['Q'], dict_value['unit'],
-                                              dict_value['custodian'])
+                                              dict_value['custodian'])[0]
     if searched_sample:
-        print(searched_sample)
+        for each in searched_sample:
+            print(each)
         return 'Successfully searched {} in the database.'.format(dict_value['sample_ID'])
     else:
         return jsonify({"errorMsg": "Failed search sample"}), 400
@@ -44,9 +49,11 @@ def view_logs():
     View all sample records
     i.e., view all transactions stored in the database
     '''
-    all_logs = backend.view_logs()
+    all_logs = backend.view_logs()[0]
 
     if all_logs:
+        for each in all_logs:
+            print(each)
         return 'Successfully view the logbook of the database.'
     else:
         return jsonify({"errorMsg": "Failed view the logbook"}), 400
@@ -57,9 +64,11 @@ def view_samples():
     View all samples
     i.e., view all samples' latest profile
     '''
-    all_samples = backend.view_samples()
+    all_samples = backend.view_samples()[0]
 
     if all_samples:
+        for each in all_samples:
+            print(each)
         return 'Successfully view all samples in the database.'
     else:
         return jsonify({"errorMsg": "Failed view all samples"}), 400
@@ -74,8 +83,10 @@ def check_db():
     '''
     dict_value = request.get_json()
     checked_data = backend.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
-                                 dict_value['status'], dict_value['custodian'])
+                                 dict_value['status'], dict_value['custodian'])[0]
     if checked_data:
+        for each in checked_data:
+            print(each)
         return 'Successfully checked status.'
     else:
         return jsonify({"errorMsg": "Failed check status"}), 400

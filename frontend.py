@@ -56,7 +56,7 @@ def search_command():
     search_result = backend.search_improved(sample_type.get(), sample_ID.get(),
                                             storage_loc.get(), status.get(),
                                             quantity.get(), unit.get(),
-                                            custodian.get())
+                                            custodian.get())[0]
     # Notice: there is a second method of designing the search function, see search() in backend.py
 
     if search_result:
@@ -68,19 +68,21 @@ def search_command():
 
 def view_logs_command(): # view all the samples' records/logs
     list.delete(0,END)
-    for row in backend.view_logs():
+    all_logs = backend.view_logs()[0]
+    for row in all_logs:
         list.insert(END,row)
 
 def view_samples_command(): # view all the samples' current/final status
     list.delete(0,END)
-    for row in backend.view_samples():
+    all_samples = backend.view_samples()[0]
+    for row in all_samples:
         list.insert(END,row)
 
 def check_command():
     list.delete(0,END)
 
     check_result = backend.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                                 custodian.get())
+                                 custodian.get())[0]
     if check_result:
         for row in check_result:
             list.insert(END,row)

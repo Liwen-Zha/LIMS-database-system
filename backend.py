@@ -350,6 +350,33 @@ def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
         print('NO MATCHED RECORDS!')
         return False
 
+def view_logs():
+    '''
+    View all sample transactions in the database.
+    '''
+    all_samples = graph.run("MATCH (a: Sample) RETURN a").data()
+    view_all = list()
+    view_sample_info = list()
+    for each in all_samples:
+        each_sample = list(each.values())[0]
+        each_sample_id = each_sample['id'][1:-1]
+        records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
+                            "WHERE id(n) = $s RETURN r1,r2", s=each_sample.identity).data()
+
+        r_who = list(records[0].values())[0]
+        who = r_who.start_node['name'][1:-1]
+        who_time = list(r_who.values())[0][1:-1]
+
+        r_where = list(records[0].values())[1]
+        where = r_where.end_node['id'][1:-1]
+
+        txt = [who, 'operated', each_sample_id, 'in freezer', where, 'at', who_time ]
+
+        view_all.append(txt)
+        view_sample_info.append(each_sample)
+
+    return view_all, view_sample_info
+
 def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
     '''
     This function is simpler compared with search(sample_type, sample_ID, loc, status, Q, unit, custodian).
@@ -371,56 +398,41 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
     while '' in this_search:
         this_search.remove('')
 
-    search_all = view_logs()
+    search_all = view_logs()[0]
+    search_sample = view_logs()[1]
+    mark = 0
     search_result = list()
+    search_sample_info = list()
 
     for each in search_all:
-        this_sample = each[2]
-        this_type = re.findall(r'type: "(.+?)"', this_sample)
-        this_id = re.findall(r'id: "([^"]+)", status', this_sample)
+        this_sample = search_sample[mark]
+        this_type = this_sample['type'][1:-1]
+        this_id = this_sample['id'][1:-1]
         this_loc = each[4]
-        this_status = re.findall(r'status: "([^"]+)", type', this_sample)
-        this_q = re.findall(r'Qvar: (.+), Qvar_unit', this_sample)
-        this_unit = re.findall(r'Qvar_unit: "([^"]+)", id', this_sample)
+        this_status = this_sample['status'][1:-1]
+        this_q = this_sample['Qvar']
+        this_unit = this_sample['Qvar_unit'][1:-1]
         this_who = each[0]
-        this_all = [this_type[0][1:-1], this_id[0][1:-1], this_loc[1:-1], this_status[0][1:-1],
-                    this_q[0], this_unit[0][1:-1], this_who[1:-1]]
+        this_all = [this_type, this_id, this_loc, this_status,
+                    this_q, this_unit, this_who]
 
         if set(this_search) <= set(this_all):
+            mark = mark+1
             search_result.append(each)
+            search_sample_info.append(this_sample)
         else:
+            mark = mark+1
             continue
 
-    return search_result
+    return search_result, search_sample_info
 
-def view_logs():
-    '''
-    View all sample transactions in the database.
-    '''
-    all_samples = graph.run("MATCH (a: Sample) RETURN a").data()
-    view_all = list()
-    for each in all_samples:
-        each_sample = list(each.values())[0]
-        records = graph.run("MATCH (p: Person)-[r1:OPERATE]-> (n:Sample)-[r2:IN]->(f:Freezer) "
-                            "WHERE id(n) = $s RETURN r1,r2", s=each_sample.identity).data()
-
-        r_who = list(records[0].values())[0]
-        who = r_who.start_node['name']
-        who_time = list(r_who.values())[0]
-
-        r_where = list(records[0].values())[1]
-        where = r_where.end_node['id']
-
-        txt = [who,'operate',str(each_sample),' in freezer: ',where,' at ', who_time ]
-        view_all.append(txt)
-
-    return view_all
 
 def view_samples():
     '''
     View all samples registered in the database.
     '''
     show_check = list()
+    all_sample_info = list()
     uni_id = list()
     uni_samples = list()
     alone_samples = list()
@@ -460,12 +472,17 @@ def view_samples():
         find_where = list(records[0].values())[1]
         txt_where = find_where.end_node['id']
 
-        txt = 'Type:{} ID:{} Quantity:{} Unit:{} Location:{} Status:{} latest operated by:{}'.\
-            format(each['type'], each['id'], each['Qnow'], each['Qnow_unit'], txt_where, each['status'], txt_who)
+        txt = 'Type: {} ID: {} Quantity: {} Unit: {} Location: {} Status: {} latest operated by: {}'.\
+            format(each['type'][1:-1], each['id'][1:-1], each['Qnow'], each['Qnow_unit'][1:-1],
+                   txt_where[1:-1], each['status'][1:-1], txt_who[1:-1])
+        this_sample_info = [each['type'][1:-1], each['id'][1:-1], each['Qnow'], each['Qnow_unit'][1:-1],
+                       txt_where[1:-1], each['status'][1:-1], txt_who[1:-1]]
+
 
         show_check.append(txt)
+        all_sample_info.append(this_sample_info)
 
-    return show_check
+    return show_check, all_sample_info
 
 def check(sample_type, sample_ID, loc, status, custodian):
     '''
@@ -484,23 +501,30 @@ def check(sample_type, sample_ID, loc, status, custodian):
     while '' in this_input:
         this_input.remove('')
 
-    show_check = view_samples()
+    show_check = view_samples()[0]
+    all_sample_info = view_samples()[1]
+    check_sample_info = list()
     check_result = list()
+    mark = 0
 
     for each in show_check:
-        this_type = re.findall(r"Type:'(.+)' ID", each)
-        this_id = re.findall(r"ID:'(.+)' Quantity", each)
-        this_loc = re.findall(r"Location:'(.+)' Status", each)
-        this_sta = re.findall(r"Status:'(.+)' latest", each)
-        this_who = re.findall(r"latest operated by:'(.+)'", each)
+        this_type = re.findall(r"Type: (.+) ID", each)
+        this_id = re.findall(r"ID: (.+) Quantity", each)
+        this_loc = re.findall(r"Location: (.+) Status", each)
+        this_sta = re.findall(r"Status: (.+) latest", each)
+        this_who = re.findall(r"latest operated by: (.+)", each)
         this_element = [this_type[0], this_id[0], this_loc[0], this_sta[0], this_who[0]]
 
         if set(this_input) <= set(this_element):
             check_result.append(each)
+            check_sample_info.append(all_sample_info[mark])
+            mark = mark +1
+
         else:
+            mark = mark+1
             continue
 
-    return check_result
+    return check_result, check_sample_info
 
 
 
