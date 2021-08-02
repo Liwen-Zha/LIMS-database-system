@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from backend.neo4j_db import model
+from backend.graph_database import model
 
 app = Flask(__name__)
 

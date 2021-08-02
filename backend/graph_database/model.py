@@ -1,4 +1,4 @@
-import backend.neo4j_db.mathtools
+import backend.graph_database.mathtools
 import re
 import time
 from py2neo import *

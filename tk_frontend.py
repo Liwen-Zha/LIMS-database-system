@@ -1,5 +1,5 @@
 from tkinter import *
-from backend.neo4j_db import model
+from backend.graph_database import model
 
 '''
   frontend.py:
