@@ -1,5 +1,4 @@
-import backend
-import tools
+import model
 
 '''
   function_test.py:
@@ -20,27 +19,27 @@ if __name__ == "__main__":
 
     # 2. Use hash mark (#) or triple quotes (''') to comment the following test cases
     print('Test result of get_time():')
-    test_time = backend.get_time()
+    test_time = model.get_time()
     if test_time:
         print(test_time)
     else:
         print('no test_time')
 
     print('\nTest result of insert():')
-    if backend.insert(sample_type, sample_ID, loc, status, Q, unit, custodian, test_time):
+    if model.insert(sample_type, sample_ID, loc, status, Q, unit, custodian, test_time):
         print('Insert Done')
     else:
         print('Insert Failed')
 
     print('\nTest result of search():')
-    test_search = backend.search(sample_type, sample_ID, loc, status, Q, unit, custodian)
+    test_search = model.search(sample_type, sample_ID, loc, status, Q, unit, custodian)
     if test_search:
         print(test_search)
     else:
         print('no test_search')
 
     print('\nTest result of view_logs():')
-    test_view_logs = backend.view_logs()[0]
+    test_view_logs = model.view_logs()[0]
     if test_view_logs:
         for each in test_view_logs:
             print(each)
@@ -48,7 +47,7 @@ if __name__ == "__main__":
         print('no test_view_logs')
 
     print('\nTest result of view_samples():')
-    test_view_samples = backend.view_samples()[0]
+    test_view_samples = model.view_samples()[0]
     if test_view_samples:
         for each in test_view_samples:
             print(each)
@@ -56,15 +55,15 @@ if __name__ == "__main__":
         print('no test_view_samples')
 
     print('\nTest result of check():')
-    test_check = backend.check(sample_type, sample_ID, loc, status, custodian)[0]
+    test_check = model.check(sample_type, sample_ID, loc, status, custodian)[0]
     if test_check:
         print(test_check)
     else:
         print('no test_result')
 
     print('\nTest result of search_improved():')
-    test_search_improved = backend.search_improved(sample_type, sample_ID, loc, status, Q,
-                                                   unit, custodian)[0]
+    test_search_improved = model.search_improved(sample_type, sample_ID, loc, status, Q,
+                                                 unit, custodian)[0]
     if test_search_improved:
         print(test_search_improved)
     else:

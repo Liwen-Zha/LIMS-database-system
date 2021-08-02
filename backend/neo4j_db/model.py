@@ -1,6 +1,7 @@
-from tools import *
+import backend.neo4j_db.mathtools
 import re
 import time
+from py2neo import *
 
 '''
   backend.py:
@@ -37,11 +38,11 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
                        Qnow=None, Qnow_unit=None,status =repr(status))
 
-    check_existence = existenceChecker(sample_ID, loc, custodian)
+    check_existence = backend.neo4j_db.mathtools.existenceChecker(sample_ID, loc, custodian)
 
     if check_existence.check_existing_samples() and len(check_existence.check_existing_samples()) >= 1:
 
-        find_samples = sampleFinder(sample_ID)
+        find_samples = backend.neo4j_db.mathtools.sampleFinder(sample_ID)
 
         node_pre_sample = find_samples.find_last_sample()
         node_1st_sample = find_samples.find_first_sample()
@@ -52,7 +53,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
         # Use the class quantityCalculator() in tools.py to calculate the current quantity of the sample.
         # Notice: for each sample id, the result of quantityCalculator() is the sum of all previous quantity variations
         #         of the sample, which means it excludes the quantity variation of the current sample transaction.
-        calculate_quantity = quantityCalculator(sample_ID)
+        calculate_quantity = backend.neo4j_db.mathtools.quantityCalculator(sample_ID)
         previous_quantity = calculate_quantity.calculate_quantity_variations()
         current_quantity = previous_quantity + float(Q)
         node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})

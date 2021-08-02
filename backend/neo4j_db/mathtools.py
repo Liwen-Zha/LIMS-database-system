@@ -44,9 +44,7 @@ class existenceChecker(object):
         else:
             return False
 
-
 class sampleFinder(object):
-
     def __init__(self, sampleID):
         self.sampleID = sampleID
 

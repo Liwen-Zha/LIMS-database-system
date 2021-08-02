@@ -1,5 +1,5 @@
 from tkinter import *
-import backend
+from backend.neo4j_db import model
 
 '''
   frontend.py:
@@ -7,7 +7,7 @@ import backend
   It can also be considered as a 'test file' of the backend development. 
 '''
 def get_time():
-    now_time = backend.get_time()
+    now_time = model.get_time()
     show_time.configure(text=now_time)
     window.after(500, get_time)
 
@@ -41,23 +41,23 @@ def auto_delete():
     input_custodian.delete(0,END)
 
 def add_command():
-    backend.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+    model.insert(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
                    quantity.get(), unit.get(), custodian.get())
 
     list.delete(0,END)
     list.insert(END,(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
-                     quantity.get(), unit.get(), custodian.get(), 'Date & time:' + backend.get_time()))
+                     quantity.get(), unit.get(), custodian.get(), 'Date & time:' + model.get_time()))
 
     auto_delete()
 
 def search_command():
     list.delete(0,END)
 
-    search_result = backend.search_improved(sample_type.get(), sample_ID.get(),
+    search_result = model.search_improved(sample_type.get(), sample_ID.get(),
                                             storage_loc.get(), status.get(),
                                             quantity.get(), unit.get(),
                                             custodian.get())[0]
-    # Notice: there is a second method of designing the search function, see search() in backend.py
+    # Notice: there is a second method of designing the search function, see search() in model.py
 
     if search_result:
         for row in search_result:
@@ -68,20 +68,20 @@ def search_command():
 
 def view_logs_command(): # view all the samples' records/logs
     list.delete(0,END)
-    all_logs = backend.view_logs()[0]
+    all_logs = model.view_logs()[0]
     for row in all_logs:
         list.insert(END,row)
 
 def view_samples_command(): # view all the samples' current/final status
     list.delete(0,END)
-    all_samples = backend.view_samples()[0]
+    all_samples = model.view_samples()[0]
     for row in all_samples:
         list.insert(END,row)
 
 def check_command():
     list.delete(0,END)
 
-    check_result = backend.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
+    check_result = model.check(sample_type.get(), sample_ID.get(), storage_loc.get(), status.get(),
                                  custodian.get())[0]
     if check_result:
         for row in check_result:

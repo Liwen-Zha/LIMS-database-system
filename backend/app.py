@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import backend
+from backend.neo4j_db import model
 
 app = Flask(__name__)
 
@@ -17,9 +17,9 @@ def log_sample():
     dict_value = request.get_json()
     json_value = jsonify(dict_value)
 
-    new_sample = backend.insert(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
-                                dict_value['status'], dict_value['Q'], dict_value['unit'],
-                                dict_value['custodian'])
+    new_sample = model.insert(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
+                              dict_value['status'], dict_value['Q'], dict_value['unit'],
+                              dict_value['custodian'])
 
     if new_sample:
         return json_value
@@ -32,10 +32,10 @@ def search_sample():
     Search sample records
     '''
     dict_value = request.get_json()
-    searched_sample = backend.search_improved(dict_value['sample_type'], dict_value['sample_ID'],
-                                              dict_value['loc'],dict_value['status'],
-                                              dict_value['Q'], dict_value['unit'],
-                                              dict_value['custodian'])[0]
+    searched_sample = model.search_improved(dict_value['sample_type'], dict_value['sample_ID'],
+                                            dict_value['loc'], dict_value['status'],
+                                            dict_value['Q'], dict_value['unit'],
+                                            dict_value['custodian'])[0]
     if searched_sample:
         for each in searched_sample:
             print(each)
@@ -49,7 +49,7 @@ def view_logs():
     View all sample records
     i.e., view all transactions stored in the database
     '''
-    all_logs = backend.view_logs()[0]
+    all_logs = model.view_logs()[0]
 
     if all_logs:
         for each in all_logs:
@@ -64,7 +64,7 @@ def view_samples():
     View all samples
     i.e., view all samples' latest profile
     '''
-    all_samples = backend.view_samples()[0]
+    all_samples = model.view_samples()[0]
 
     if all_samples:
         for each in all_samples:
@@ -82,8 +82,8 @@ def check_db():
           check the sample(s) operated by certain custodian
     '''
     dict_value = request.get_json()
-    checked_data = backend.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
-                                 dict_value['status'], dict_value['custodian'])[0]
+    checked_data = model.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
+                               dict_value['status'], dict_value['custodian'])[0]
     if checked_data:
         for each in checked_data:
             print(each)
