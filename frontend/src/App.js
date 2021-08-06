@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 function App() {
   //console.log("hello")
     return (
+        <div>
         <HashRouter>
         <body class="d-flex text-center text-white bg-dark">
 
@@ -71,6 +72,7 @@ function App() {
 
         </body>
         </HashRouter>
+        </div>
     );
 
 }
