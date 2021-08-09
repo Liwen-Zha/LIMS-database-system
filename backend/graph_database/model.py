@@ -38,11 +38,11 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
                        Qnow=None, Qnow_unit=None,status =repr(status))
 
-    check_existence = backend.neo4j_db.mathtools.existenceChecker(sample_ID, loc, custodian)
+    check_existence = backend.graph_database.mathtools.existenceChecker(sample_ID, loc, custodian)
 
     if check_existence.check_existing_samples() and len(check_existence.check_existing_samples()) >= 1:
 
-        find_samples = backend.neo4j_db.mathtools.sampleFinder(sample_ID)
+        find_samples = backend.graph_database.mathtools.sampleFinder(sample_ID)
 
         node_pre_sample = find_samples.find_last_sample()
         node_1st_sample = find_samples.find_first_sample()
@@ -53,7 +53,7 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
         # Use the class quantityCalculator() in tools.py to calculate the current quantity of the sample.
         # Notice: for each sample id, the result of quantityCalculator() is the sum of all previous quantity variations
         #         of the sample, which means it excludes the quantity variation of the current sample transaction.
-        calculate_quantity = backend.neo4j_db.mathtools.quantityCalculator(sample_ID)
+        calculate_quantity = backend.graph_database.mathtools.quantityCalculator(sample_ID)
         previous_quantity = calculate_quantity.calculate_quantity_variations()
         current_quantity = previous_quantity + float(Q)
         node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})
@@ -473,12 +473,10 @@ def view_samples():
         find_where = list(records[0].values())[1]
         txt_where = find_where.end_node['id']
 
-        txt = 'Type: {} ID: {} Quantity: {} Unit: {} Location: {} Status: {} latest operated by: {}'.\
-            format(each['type'][1:-1], each['id'][1:-1], each['Qnow'], each['Qnow_unit'][1:-1],
-                   txt_where[1:-1], each['status'][1:-1], txt_who[1:-1])
+        txt = ['Type:', each['type'][1:-1],'ID:',each['id'][1:-1],'Qnow:',each['Qnow'], 'Qnow_unit:', each['Qnow_unit'][1:-1],
+               'Location:', txt_where[1:-1], 'Status:',each['status'][1:-1], 'Custodian:', txt_who[1:-1]]
         this_sample_info = [each['type'][1:-1], each['id'][1:-1], each['Qnow'], each['Qnow_unit'][1:-1],
                        txt_where[1:-1], each['status'][1:-1], txt_who[1:-1]]
-
 
         show_check.append(txt)
         all_sample_info.append(this_sample_info)
@@ -509,12 +507,12 @@ def check(sample_type, sample_ID, loc, status, custodian):
     mark = 0
 
     for each in show_check:
-        this_type = re.findall(r"Type: (.+) ID", each)
-        this_id = re.findall(r"ID: (.+) Quantity", each)
-        this_loc = re.findall(r"Location: (.+) Status", each)
-        this_sta = re.findall(r"Status: (.+) latest", each)
-        this_who = re.findall(r"latest operated by: (.+)", each)
-        this_element = [this_type[0], this_id[0], this_loc[0], this_sta[0], this_who[0]]
+        this_type = each[1]
+        this_id = each[3]
+        this_loc = each[9]
+        this_sta = each[11]
+        this_who = each[13]
+        this_element = [this_type, this_id, this_loc, this_sta, this_who]
 
         if set(this_input) <= set(this_element):
             check_result.append(each)

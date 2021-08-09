@@ -13,9 +13,8 @@ import { NavLink } from "react-router-dom";
 function App() {
   //console.log("hello")
     return (
-        <div>
+        <div class="App">
         <HashRouter>
-
         <body class="text-center text-white bg-dark">
 
         <div class="main-page-config d-flex p-3 mx-auto flex-column">
