@@ -1,6 +1,9 @@
 import './App.css';
 import React from "react";
-import Log from "./pages/Log.jsx";
+import Log from "./pages/Log";
+import Search from "./pages/Search";
+import Check from "./pages/Check";
+import View from "./pages/View";
 import {
     Route,
     HashRouter
@@ -10,9 +13,8 @@ import { NavLink } from "react-router-dom";
 function App() {
   //console.log("hello")
     return (
-        <div>
+        <div class="App">
         <HashRouter>
-
         <body class="text-center text-white bg-dark">
 
         <div class="main-page-config d-flex p-3 mx-auto flex-column">
@@ -58,7 +60,10 @@ function App() {
                 </p>
             </main>
 
-            <Route exact path="/log" component={Log}/>
+            <Route path="/log" component={Log}/>
+            <Route path="/search" component={Search}/>
+            <Route path = '/check' component={Check} />
+            <Route path = '/view' component={View} />
 
 
 
@@ -74,43 +79,5 @@ function App() {
     );
 
 }
-export default App;
-
-
-/*
-zoom in page
-did not know why
-*/
-import './App.css';
-import React from "react";
-
-function App() {
-  //console.log("hello")
-    return (
-        <body>
-
-        <main>
-            <h1 className="visually-hidden">Heroes examples</h1>
-
-            <div className="px-4 py-5 my-5 text-center text-white bg-dark">
-
-                    <h1 className="display-5 fw-bold">Centered hero</h1>
-                    <div className="col-lg-6 mx-auto">
-                        <p className="lead mb-4">Quickly design and customize responsive mobile-first sites with
-                            Bootstrap, the world’s most popular front-end open source toolkit, featuring Sass variables
-                            and mixins, responsive grid system, extensive prebuilt components, and powerful JavaScript
-                            plugins.</p>
-                        <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <button type="button" className="btn btn-primary btn-lg px-4 gap-3">Primary button</button>
-                            <button type="button" className="btn btn-outline-secondary btn-lg px-4">Secondary</button>
-                        </div>
-                    </div>
-            </div>
-        </main>
-        </body>
-    );
-
-}
 
 export default App;
-
