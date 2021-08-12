@@ -12,7 +12,8 @@ class Child extends Component{
                 </div>
                 </div>
             </div>
-            
+
+
         )
         
     }

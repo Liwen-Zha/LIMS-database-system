@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import '../App.css';
 import axios from 'axios';
 
+
 class Log extends Component {
     constructor(props){
         super(props)
@@ -17,6 +18,7 @@ class Log extends Component {
         }
         this.handleInput = this.handleInput.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
     handleInput = (e) => {
@@ -63,10 +65,24 @@ class Log extends Component {
         }
 
     }
+    handleSubmit  = (e) => {
+        e.preventDefault();
+
+        axios.post('/log', {
+                sample_type: this.state.inputType,
+                sample_ID: this.state.inputID,
+                loc: this.state.inputLoc,
+                status: this.state.inputStatus,
+                Q: this.state.inputQ,
+                unit: this.state.inputUnit,
+                custodian: this.state.inputCustodian
+            }).then(res => {
+            console.log(res.data);
+        })
+    }
 
     onButtonClick = (e) => {
-        if (e.target.id ==="submit"){
-
+            //console.log('.....');
             const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
             axios.post('/log',{
                 sample_type: _this.state.inputType,
@@ -78,15 +94,15 @@ class Log extends Component {
                 custodian: _this.state.inputCustodian
             })
                 .then(function (response) {
-                    console.log(response);
-                    _this.setState({
+                    console.log(response.data);
+                    this.setState({
                         outputData: response.data
                     })
                 })
                 .catch(function (error) {
                     console.log(error);
                 })
-        }
+
     }
 
     render() {
@@ -138,7 +154,25 @@ class Log extends Component {
                                aria-describedby="custodianHelp" onChange={this.handleInput}/>
                             <div id="custodianHelp" className="form-text">e.g., peter, helen, mary, etc.</div>
                     </div>
-                    <button type="submit" className="btn btn-primary" onClick={this.onButtonClick}>Submit</button>
+                    <button type="button" className="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop" onClick={this.onButtonClick}>Submit</button>
+
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark" id="staticBackdropLabel">Notice</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-dark">You have successfully submitted the sample log!</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
 
             </div>

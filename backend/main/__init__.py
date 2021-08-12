@@ -1,16 +1,21 @@
-from flask import Flask, jsonify, request
-from flask_cors import *
+from flask import render_template, jsonify, request
+from flask import Blueprint
+from flask import url_for
+
 from backend.graph_database import model
 
-app = Flask(__name__)
-CORS(app, supports_credentials = True)
+main = Blueprint('main', __name__, template_folder='templates', static_folder='static', static_url_path="/static")
 
+'''@main.route('/', defaults={'path': ''})
+@main.route('/<path:path>')
+def index(path):
+  return render_template('index.html')'''
 
-@app.route('/')
-def home():
-    return '<h1>Home Page</h1>'
+@main.route('/')
+def show_home():
+    return render_template('index.html')
 
-@app.route('/log', methods=['POST'])
+@main.route('/log', methods=['POST'])
 def log_sample():
     '''
     Log sample transaction
@@ -37,7 +42,8 @@ def log_sample():
     else:
         return jsonify({"errorMsg": "Failed add sample"}), 400
 
-@app.route('/search', methods = ["POST"])
+
+@main.route('/search', methods = ["POST"])
 def search_sample():
     '''
     Search sample records
@@ -85,7 +91,7 @@ def search_sample():
     else:
         return jsonify({"errorMsg": "Failed search sample"}), 400
 
-@app.route('/view-logs', methods = ["GET"])
+@main.route('/view-logs', methods = ["GET"])
 def view_logs():
     '''
     View all sample records
@@ -126,7 +132,7 @@ def view_logs():
     else:
         return jsonify({"errorMsg": "Failed view the logbook"}), 400
 
-@app.route('/view-samples', methods = ["GET"])
+@main.route('/view-samples', methods = ["GET"])
 def view_samples():
     '''
     View all samples
@@ -162,7 +168,7 @@ def view_samples():
     else:
         return jsonify({"errorMsg": "Failed view all samples"}), 400
 
-@app.route('/check', methods = ["POST"])
+@main.route('/check', methods = ["POST"])
 def check_db():
     '''
     Check the current status of certain sample/freezer/custodian
@@ -203,5 +209,4 @@ def check_db():
         return jsonify({"errorMsg": "Failed check status"}), 400
 
 
-if __name__ == '__main__':
-    app.run()
+
