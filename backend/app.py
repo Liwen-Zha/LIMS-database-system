@@ -14,20 +14,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-'''CORS(app, resources=r'/*')
-
-headers = {
-    'Cache-Control' : 'no-cache, no-store, must-revalidate',
-    'Pragma' : 'no-cache' ,
-    'Expires': '0' ,
-    'Access-Control-Allow-Origin' : 'http://localhost:3000',
-    'Access-Control-Allow-Origin' : '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
-}'''
 @app.route('/', methods=['get'])
 def show_home():
-    return {'show': 'home page'}
+    return {'page': 'home page'}
 
 @app.route('/log', methods=['POST'])
 def log_sample():
