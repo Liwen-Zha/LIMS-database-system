@@ -1,81 +1,108 @@
 import React, {Component} from 'react';
-import '../App.css'
+import '../App.css';
 import axios from 'axios';
 
-class Log_backup extends Component {
+
+class Log extends Component {
     constructor(props){
         super(props)
         this.state = {
-            inputText:"",
-            titleText:"Title",
-            bodyText:"Here is the body"
-
+            inputType: "",
+            inputID:"",
+            inputLoc:"",
+            inputStatus:"",
+            inputQ:"",
+            inputUnit:"",
+            inputCustodian:"",
+            outputData:""
         }
+        this.handleInput = this.handleInput.bind(this);
+        this.onButtonClick = this.onButtonClick.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
-    sampleLogWithBackend(){
-        const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
-        axios.get('https://5b5e71c98e9f160014b88cc9.mockapi.io/api/v1/lists')
-        .then(function (response) {
-            _this.setState({
-                users:response.data,
-                isLoaded:true
-            });
-        })
-        .catch(function (error) {
-            console.log(error);
-            _this.setState({
-                isLoaded:false,
-                error:error
+    handleInput = (e) => {
+        if (e.target.id === "inputSampleType"){
+            this.setState({
+                inputType: e.target.value
             })
-        })
-    }
+        }
 
-    sampleLogWithBackend2(){
-        const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
-        axios.post('/log',{
-            type: _this.state.inputType,
-            id: _this.state.inputID,
-            loc: _this.state.inputLoc,
-            status: _this.state.inputStatus,
-            Qvar: _this.state.inputQ,
-            Qvar_unit: _this.state.inputUnit,
-            custodian: _this.state.inputCustodian
-
-
-        })
-        .then(function (response) {
-            _this.setState({
-                users:response.data,
-                isLoaded:true
-            });
-        })
-        .catch(function (error) {
-            console.log(error);
-            _this.setState({
-                isLoaded:false,
-                error:error
+        if (e.target.id === "inputSampleID"){
+            this.setState({
+                inputID: e.target.value
             })
+        }
+
+        if (e.target.id === "inputLocation"){
+            this.setState({
+                inputLoc: e.target.value
+            })
+        }
+
+        if (e.target.id === "inputStatus"){
+            this.setState({
+                inputStatus: e.target.value
+            })
+        }
+
+        if (e.target.id === "inputQuantity"){
+            this.setState({
+                inputQ: e.target.value
+            })
+        }
+
+        if (e.target.id === "inputUnit"){
+            this.setState({
+                inputUnit: e.target.value
+            })
+        }
+
+        if (e.target.id === "inputCustodian"){
+            this.setState({
+                inputCustodian: e.target.value
+            })
+        }
+
+    }
+    handleSubmit  = (e) => {
+        e.preventDefault();
+
+        axios.post('/log', {
+                sample_type: this.state.inputType,
+                sample_ID: this.state.inputID,
+                loc: this.state.inputLoc,
+                status: this.state.inputStatus,
+                Q: this.state.inputQ,
+                unit: this.state.inputUnit,
+                custodian: this.state.inputCustodian
+            }).then(res => {
+            console.log(res.data);
         })
     }
 
-    sampleLogWithBackend3(){
-        const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
-        axios.post('/log',{
-            sample_type: _this.state.inputType,
-            sample_ID: _this.state.inputID,
-            loc: _this.state.inputLoc,
-            status: _this.state.inputStatus,
-            Q: _this.state.inputQ,
-            unit: _this.state.inputUnit,
-            custodian: _this.state.inputCustodian
-        })
-        .then(function (response) {
-             console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+    onButtonClick = (e) => {
+            //console.log('.....');
+            const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
+            axios.post('/log',{
+                sample_type: _this.state.inputType,
+                sample_ID: _this.state.inputID,
+                loc: _this.state.inputLoc,
+                status: _this.state.inputStatus,
+                Q: _this.state.inputQ,
+                unit: _this.state.inputUnit,
+                custodian: _this.state.inputCustodian
+            })
+                .then(function (response) {
+                    console.log(response.data);
+                    this.setState({
+                        outputData: response.data
+                    })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+
     }
 
     render() {
@@ -87,45 +114,65 @@ class Log_backup extends Component {
                 <form>
                     <div className="mb-0">
                         <label htmlFor="inputSampleType" className="Sample Type:">Sample Type:</label>
-                        <input type="type" className="form-control" id="inputSampleType" aria-describedby="typeHelp"/>
+                        <input type="type" className="form-control" id="inputSampleType"
+                               aria-describedby="typeHelp" onChange={this.handleInput}/>
                             <div id="typeHelp" className="form-text">e.g., blood, DNA, RNA, etc.</div>
                     </div>
                     <div className="mb-1">
                         <label htmlFor="inputSampleID" className="form-label">Sample ID:</label>
-                        <input type="id" className="form-control" id="inputSampleID" aria-describedby="idHelp"/>
+                        <input type="id" className="form-control" id="inputSampleID"
+                               aria-describedby="idHelp" onChange={this.handleInput}/>
                             <div id="idHelp" className="form-text">e.g., blo001, DNA123, RNA024, etc.</div>
                     </div>
                     <div className="mb-1">
                         <label htmlFor="inputLocation" className="form-label">Storage Location:</label>
-                        <input type="loc" className="form-control" id="inputLocation" aria-describedby="locHelp"/>
+                        <input type="loc" className="form-control" id="inputLocation"
+                               aria-describedby="locHelp" onChange={this.handleInput}/>
                             <div id="locHelp" className="form-text">e.g., f1, f5, f10, etc.</div>
                     </div>
                     <div className="mb-1">
                         <label htmlFor="inputStatus" className="form-label">Status:</label>
-                        <input type="status" className="form-control" id="inputStatus" aria-describedby="statusHelp"/>
+                        <input type="status" className="form-control" id="inputStatus"
+                               aria-describedby="statusHelp" onChange={this.handleInput}/>
                             <div id="statusHelp" className="form-text">i.e., available, in use, booked.</div>
                     </div>
                     <div className="mb-1">
-                        <label htmlFor="inputSampleID" className="form-label">Sample ID:</label>
-                        <input type="id" className="form-control" id="inputSampleID" aria-describedby="idHelp"/>
-                            <div id="idHelp" className="form-text">e.g., blo001, DNA123, RNA024, etc.</div>
-                    </div>
-                    <div className="mb-1">
                         <label htmlFor="inputQuantity" className="form-label">Quantity Variation:</label>
-                        <input type="q" className="form-control" id="inputQuantity" aria-describedby="qHelp"/>
+                        <input type="q" className="form-control" id="inputQuantity"
+                               aria-describedby="qHelp" onChange={this.handleInput}/>
                             <div id="qHelp" className="form-text">e.g., 10, -5, -1.5, etc.</div>
                     </div>
                     <div className="mb-1">
                         <label htmlFor="inputUnit" className="form-label">Unit:</label>
-                        <input type="unit" className="form-control" id="inputUnit" aria-describedby="unitHelp"/>
+                        <input type="unit" className="form-control" id="inputUnit"
+                               aria-describedby="unitHelp" onChange={this.handleInput}/>
                             <div id="unitHelp" className="form-text">e.g., ml, plate, tube, etc.</div>
                     </div>
                     <div className="mb-1">
                         <label htmlFor="inputCustodian" className="form-label">Custodian:</label>
-                        <input type="custodian" className="form-control" id="inputCustodian" aria-describedby="custodianHelp"/>
+                        <input type="custodian" className="form-control" id="inputCustodian"
+                               aria-describedby="custodianHelp" onChange={this.handleInput}/>
                             <div id="custodianHelp" className="form-text">e.g., peter, helen, mary, etc.</div>
                     </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
+                    <button type="button" className="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop" onClick={this.onButtonClick}>Submit</button>
+
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark" id="staticBackdropLabel">Notice</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-dark">You have successfully submitted the sample log!</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
 
             </div>
