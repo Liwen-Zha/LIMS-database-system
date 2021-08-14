@@ -1,22 +1,20 @@
 import React, {Component} from 'react';
 
-class searchTable extends Component{n
-  constructor(props){
+class searchTable extends Component{
+    constructor(props){
     super(props);
   }
   render(){
     return (
-      this.props.jsonData.map((searchData,i)=>{
-      return (
-
-          <div key={i} className="text-center">
-            <h4>{searchData['type']}</h4>
-            <h4>{searchData['id']}</h4>
-            <h4>{searchData['Qvar']}</h4>
-            <h4>{searchData['Qvar_unit']}</h4>
-          </div>
-      )
-
+      this.props.outputData.map((each,i)=>{
+          return (
+              <tr key={i} className="text-center">
+                <td>{each.id}</td>
+                <td>{each.type}</td>
+                <td>{each.Qvar}</td>
+                <td>{each.Qvar_unit}</td>
+              </tr>
+          )       
       })
     )
   }

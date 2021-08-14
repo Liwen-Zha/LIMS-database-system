@@ -58,34 +58,33 @@ def search_sample():
         i = 0
         searchResults = []
         for each in searched_sample:
-            #print(each)
-            #print(searched_sample_info[i])
             who = each[0]
-            type = searched_sample_info[i]['type']
-            sample = each[2]
+            thistype = searched_sample_info[i]['type']
+            thissample = each[2]
             where = each[4]
-            Qvar = searched_sample_info[i]['Qvar']
-            Qvar_unit = searched_sample_info[i]['Qvar_unit']
-            Qnow = searched_sample_info[i]['Qnow']
-            Qnow_unit = searched_sample_info[i]['Qnow_unit']
-            time = each[6]
+            thisQvar = searched_sample_info[i]['Qvar']
+            thisQvar_unit = searched_sample_info[i]['Qvar_unit']
+            thisQnow = searched_sample_info[i]['Qnow']
+            thisQnow_unit = searched_sample_info[i]['Qnow_unit']
+            thistime = each[6]
 
             searchResult = {
                 "custodian": who,
                 "type": type,
-                "id": sample,
+                "id": thissample,
                 "loc": where,
-                "Qvar": Qvar,
-                "Qvar_unit": Qvar_unit,
-                "Qnow": Qnow,
-                "Qnow_unit": Qnow_unit,
-                "time": time
+                "Qvar": thisQvar,
+                "Qvar_unit": thisQvar_unit,
+                "Qnow": thisQnow,
+                "Qnow_unit": thisQnow_unit,
+                "time": thistime
             }
             print(searchResult)
             searchResults.append(searchResult)
             i=i+1
 
         print(searchResults)
+        print(jsonify(searchResults))
         return jsonify(searchResults)
 
     else:

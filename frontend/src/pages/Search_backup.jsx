@@ -162,7 +162,6 @@ class SearchBackup extends Component {
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                 </form>
