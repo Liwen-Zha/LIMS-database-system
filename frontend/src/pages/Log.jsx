@@ -74,7 +74,7 @@ class Log extends Component {
             })
                 .then(function (response) {
                     console.log(response.data);
-                    this.setState({
+                    _this.setState({
                         outputData: response.data
                     })
                 })

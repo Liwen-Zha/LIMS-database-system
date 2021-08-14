@@ -36,28 +36,34 @@ class App extends Component {
                             <p class="lead">
                                 <div className="container">
                                     <div className="row g-1">
-                                        <div className="col-3">
+                                        <div className="col">
                                             <NavLink to='/log'>
                                                 <button class="btn btn-outline-primary btn-lg" type="button">Log
                                                 </button>
                                             </NavLink>
                                         </div>
-                                        <div className="col-3">
+                                        <div className="col">
                                             <NavLink to='/search'>
                                                 <button className="btn btn-outline-secondary btn-lg"
                                                         type="button">Search
                                                 </button>
                                             </NavLink>
                                         </div>
-                                        <div className="col-3">
+                                        <div className="col">
                                             <NavLink to='/check'>
                                                 <button className="btn btn-outline-success btn-lg" type="button">Check
                                                 </button>
                                             </NavLink>
                                         </div>
-                                        <div className="col-3">
-                                            <NavLink to='/view'>
-                                                <button className="btn btn-outline-danger btn-lg" type="button">View
+                                        <div className="col">
+                                            <NavLink to='/view-samples'>
+                                                <button className="btn btn-outline-danger btn-lg" type="button">View samples
+                                                </button>
+                                            </NavLink>
+                                        </div>
+                                        <div className="col">
+                                            <NavLink to='/view-logs'>
+                                                <button className="btn btn-outline-warning btn-lg" type="button">View logs
                                                 </button>
                                             </NavLink>
                                         </div>

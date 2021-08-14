@@ -3,7 +3,8 @@ import App from './App';
 import Log from './pages/Log'
 import Search from './pages/Search'
 import Check from './pages/Check';
-import View from './pages/View';
+import ViewSamples from './pages/ViewSamples';
+import ViewLogs from './pages/ViewLogs';
 import ReactDOM from 'react-dom';
 import {
     Route,
@@ -19,7 +20,8 @@ ReactDOM.render(
             <Route path = '/log' component={Log} />
             <Route path = '/search' component={Search} />
             <Route path = '/check' component={Check} />
-            <Route path = '/view' component={View} />
+            <Route path = '/view-samples' component={ViewSamples} />
+            <Route path = '/view-logs' component={ViewLogs} />
         </Switch>
     </HashRouter>,
     document.getElementById('root')

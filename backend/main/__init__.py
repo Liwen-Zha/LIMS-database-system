@@ -1,15 +1,10 @@
 from flask import render_template, jsonify, request
 from flask import Blueprint
-from flask import url_for
 
 from backend.graph_database import model
 
-main = Blueprint('main', __name__, template_folder='templates', static_folder='static', static_url_path="/static")
 
-'''@main.route('/', defaults={'path': ''})
-@main.route('/<path:path>')
-def index(path):
-  return render_template('index.html')'''
+main = Blueprint('main', __name__, template_folder='templates', static_folder='static', static_url_path="/static")
 
 @main.route('/')
 def show_home():
@@ -38,8 +33,10 @@ def log_sample():
             'Qvar_unit': dict_value['unit'],
             'custodian': dict_value['custodian']
         }
-        return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': sampleInfo}),200
+        print(sampleInfo)
+        return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': sampleInfo})
     else:
+        print("sample log failed")
         return jsonify({"errorMsg": "Failed add sample"}), 400
 
 
@@ -61,10 +58,10 @@ def search_sample():
         i = 0
         searchResults = []
         for each in searched_sample:
-            print(each)
-            print(searched_sample_info[i])
-
+            #print(each)
+            #print(searched_sample_info[i])
             who = each[0]
+            type = searched_sample_info[i]['type']
             sample = each[2]
             where = each[4]
             Qvar = searched_sample_info[i]['Qvar']
@@ -74,19 +71,22 @@ def search_sample():
             time = each[6]
 
             searchResult = {
-                'custodian': who,
-                'id': sample,
-                'loc': where,
-                'Qvar': Qvar,
-                'Qvar_unit': Qvar_unit,
-                'Qnow': Qnow,
-                'Qnow_unit': Qnow_unit,
-                'time': time
+                "custodian": who,
+                "type": type,
+                "id": sample,
+                "loc": where,
+                "Qvar": Qvar,
+                "Qvar_unit": Qvar_unit,
+                "Qnow": Qnow,
+                "Qnow_unit": Qnow_unit,
+                "time": time
             }
+            print(searchResult)
             searchResults.append(searchResult)
             i=i+1
 
-        return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': searchResults}),200
+        print(searchResults)
+        return jsonify(searchResults)
 
     else:
         return jsonify({"errorMsg": "Failed search sample"}), 400
@@ -177,6 +177,8 @@ def check_db():
           check the sample(s) operated by certain custodian
     '''
     dict_value = request.get_json()
+
+
     checked_data = model.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
                                dict_value['status'], dict_value['custodian'])[1]
     if checked_data:

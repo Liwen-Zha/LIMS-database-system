@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import '../App.css'
 
-class Search extends Component {
+class ViewSamples extends Component {
   render() {
     return (
         <div>
             <body className="d-flex text-center text-white bg-dark">
             <div className="main-page-config d-flex p-3 mx-auto flex-column">
-                <h1>This is Search page!</h1>
+                <h1>This is View samples page!</h1>
             </div>
             </body>
         </div>
@@ -15,4 +15,4 @@ class Search extends Component {
   }
 }
 
-export default Search;
+export default ViewSamples;

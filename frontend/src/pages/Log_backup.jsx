@@ -18,7 +18,6 @@ class Log extends Component {
         }
         this.handleInput = this.handleInput.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
     handleInput = (e) => {
@@ -27,37 +26,31 @@ class Log extends Component {
                 inputType: e.target.value
             })
         }
-
         if (e.target.id === "inputSampleID"){
             this.setState({
                 inputID: e.target.value
             })
         }
-
         if (e.target.id === "inputLocation"){
             this.setState({
                 inputLoc: e.target.value
             })
         }
-
         if (e.target.id === "inputStatus"){
             this.setState({
                 inputStatus: e.target.value
             })
         }
-
         if (e.target.id === "inputQuantity"){
             this.setState({
                 inputQ: e.target.value
             })
         }
-
         if (e.target.id === "inputUnit"){
             this.setState({
                 inputUnit: e.target.value
             })
         }
-
         if (e.target.id === "inputCustodian"){
             this.setState({
                 inputCustodian: e.target.value
@@ -65,26 +58,12 @@ class Log extends Component {
         }
 
     }
-    handleSubmit  = (e) => {
-        e.preventDefault();
-
-        axios.post('/log', {
-                sample_type: this.state.inputType,
-                sample_ID: this.state.inputID,
-                loc: this.state.inputLoc,
-                status: this.state.inputStatus,
-                Q: this.state.inputQ,
-                unit: this.state.inputUnit,
-                custodian: this.state.inputCustodian
-            }).then(res => {
-            console.log(res.data);
-        })
-    }
 
     onButtonClick = (e) => {
             //console.log('.....');
-            const _this=this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
-            axios.post('/log',{
+        if (e.target.id === "submitButton") {
+            const _this = this;    //先存一下this，以防使用箭头函数this会指向我们不希望它所指向的对象。
+            axios.post('/log', {
                 sample_type: _this.state.inputType,
                 sample_ID: _this.state.inputID,
                 loc: _this.state.inputLoc,
@@ -95,14 +74,27 @@ class Log extends Component {
             })
                 .then(function (response) {
                     console.log(response.data);
-                    this.setState({
+                    _this.setState({
                         outputData: response.data
                     })
                 })
                 .catch(function (error) {
                     console.log(error);
                 })
+        }
 
+        else if (e.target.id === "closeButton"){
+            this.setState({
+                inputType: "",
+                inputID:"",
+                inputLoc:"",
+                inputStatus:"",
+                inputQ:"",
+                inputUnit:"",
+                inputCustodian:"",
+                outputData:""
+            })
+        }
     }
 
     render() {
@@ -155,7 +147,8 @@ class Log extends Component {
                             <div id="custodianHelp" className="form-text">e.g., peter, helen, mary, etc.</div>
                     </div>
                     <button type="button" className="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#staticBackdrop" onClick={this.onButtonClick}>Submit</button>
+                            data-bs-target="#staticBackdrop" id= "submitButton"
+                            onClick={this.onButtonClick}>Submit</button>
 
                     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
                          data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -167,7 +160,8 @@ class Log extends Component {
                                 </div>
                                 <div class="modal-body text-dark">You have successfully submitted the sample log!</div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                                    <button type="reset" class="btn btn-primary" data-bs-dismiss="modal"
+                                            id="closeButton">Close</button>
                                 </div>
                             </div>
                         </div>

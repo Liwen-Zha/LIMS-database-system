@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import '../App.css';
 import axios from 'axios';
-import searchTable from "../components/searchTable";
 
 
-class Search extends Component {
+class SearchBackup extends Component {
     constructor(props){
         super(props)
         this.state = {
@@ -15,7 +14,6 @@ class Search extends Component {
             searchQ:"",
             searchUnit:"",
             searchCustodian:"",
-            outputData:""
 
         }
         this.handleInput = this.handleInput.bind(this);
@@ -152,30 +150,19 @@ class Search extends Component {
                             <div id="custodianHelp" className="form-text">e.g., peter, helen, mary, etc.</div>
                     </div>
 
-                    <button type="button" className="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#staticBackdrop" id= "searchButton"
-                            onClick={this.onButtonClick}>Search</button>
+                    <button type="button" className="btn btn-primary" data-bs-toggle="collapse"
+                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
+                            id= "searchButton" onClick={this.onButtonClick}>Search</button>
 
-                    <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-                         data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel"
-                         aria-hidden="true">
-                        <div className="modal-dialog">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title text-dark" id="staticBackdropLabel">Notice</h5>
-                                    <button type="button" className="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div className="modal-body text-dark">
-                                    <searchTable jsonData = {this.state.outputData}/>
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="reset" className="btn btn-primary" data-bs-dismiss="modal"
-                                            id="closeButton">Close
-                                    </button>
+                    <div className="collapse" id="collapseExample">
+                        <div>
+                            <div className="card">
+                                <div className="card-body">
+                                    <p className="card-text">{JSON.stringify(this.state.outputData)}</p>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                 </form>
@@ -187,5 +174,6 @@ class Search extends Component {
   }
 }
 
-export default Search;
+export default SearchBackup;
+
 

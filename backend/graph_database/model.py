@@ -396,8 +396,8 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
     custodian -- the custodian of the sample transaction （e.g., peter, linda)
     '''
     this_search = [sample_type, sample_ID, loc, status, Q, unit, custodian]
-    while '' in this_search:
-        this_search.remove('')
+    while "" in this_search:
+        this_search.remove("")
 
     search_all = view_logs()[0]
     search_sample = view_logs()[1]
@@ -406,6 +406,7 @@ def search_improved(sample_type, sample_ID, loc, status, Q, unit, custodian):
     search_sample_info = list()
 
     for each in search_all:
+
         this_sample = search_sample[mark]
         this_type = this_sample['type'][1:-1]
         this_id = this_sample['id'][1:-1]
