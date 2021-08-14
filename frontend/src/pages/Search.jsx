@@ -167,7 +167,7 @@ class Search extends Component {
                                             aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body text-dark">
-                                    <searchTable jsonData = {this.state.outputData}/>
+                                    {JSON.stringify(this.state.outputData)}
                                 </div>
                                 <div className="modal-footer">
                                     <button type="reset" className="btn btn-primary" data-bs-dismiss="modal"

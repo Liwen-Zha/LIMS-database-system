@@ -8,11 +8,12 @@ class searchTable extends Component{n
     return (
       this.props.jsonData.map((searchData,i)=>{
       return (
+
           <div key={i} className="text-center">
-            <h4>{JSON.stringify(searchData["type"])}</h4>
-            <h4>{JSON.stringify(searchData["id"])}</h4>
-            <h4>{JSON.stringify(searchData["Qvar"])}</h4>
-            <h4>{JSON.stringify(searchData["Qvar_unit"])}</h4>
+            <h4>{searchData['type']}</h4>
+            <h4>{searchData['id']}</h4>
+            <h4>{searchData['Qvar']}</h4>
+            <h4>{searchData['Qvar_unit']}</h4>
           </div>
       )
 
