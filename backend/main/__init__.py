@@ -59,18 +59,20 @@ def search_sample():
         searchResults = []
         for each in searched_sample:
             who = each[0]
-            thistype = searched_sample_info[i]['type']
+            thistype = searched_sample_info[i]['type'][1:-1]
             thissample = each[2]
+            thisstatus = searched_sample_info[i]['status'][1:-1]
             where = each[4]
             thisQvar = searched_sample_info[i]['Qvar']
-            thisQvar_unit = searched_sample_info[i]['Qvar_unit']
+            thisQvar_unit = searched_sample_info[i]['Qvar_unit'][1:-1]
             thisQnow = searched_sample_info[i]['Qnow']
-            thisQnow_unit = searched_sample_info[i]['Qnow_unit']
+            thisQnow_unit = searched_sample_info[i]['Qnow_unit'][1:-1]
             thistime = each[6]
 
             searchResult = {
                 "custodian": who,
-                "type": type,
+                "type": thistype,
+                "status": thisstatus,
                 "id": thissample,
                 "loc": where,
                 "Qvar": thisQvar,
@@ -83,9 +85,10 @@ def search_sample():
             searchResults.append(searchResult)
             i=i+1
 
-        print(searchResults)
-        print(jsonify(searchResults))
-        return jsonify(searchResults)
+        #print(searchResults)
+        #print(jsonify(searchResults))
+        return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': searchResults})
+        #return jsonify(searchResults)
 
     else:
         return jsonify({"errorMsg": "Failed search sample"}), 400

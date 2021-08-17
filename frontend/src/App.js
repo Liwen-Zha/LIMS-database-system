@@ -63,7 +63,7 @@ class App extends Component {
                                         </div>
                                         <div className="col">
                                             <NavLink to='/view-logs'>
-                                                <button className="btn btn-outline-warning btn-lg" type="button">View logs
+                                                <button className="btn btn-outline-warning btn-lg" type="button">View
                                                 </button>
                                             </NavLink>
                                         </div>

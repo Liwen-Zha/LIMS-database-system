@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import '../App.css';
 import axios from 'axios';
 
-
-class SearchBackup extends Component {
+class Search extends Component {
     constructor(props){
         super(props)
         this.state = {
@@ -14,13 +13,12 @@ class SearchBackup extends Component {
             searchQ:"",
             searchUnit:"",
             searchCustodian:"",
-
         }
         this.handleInput = this.handleInput.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
     }
 
-    async fun() {
+    async startSearch() {
         const _this = this;
         await axios.post('/search', {
             sample_type: _this.state.searchType,
@@ -31,7 +29,7 @@ class SearchBackup extends Component {
                     unit: _this.state.searchUnit,
                     custodian: _this.state.searchCustodian
                 })
-                    .then(function (response) {
+                    .then(await function (response) {
                         _this.setState({
                             outputData: response.data
                         })
@@ -83,7 +81,7 @@ class SearchBackup extends Component {
     onButtonClick = (e) => {
         //console.log('.....');
         if (e.target.id === "searchButton") {
-            this.fun().then(r => console.log(r))
+            return this.startSearch()
         }
 
         else if (e.target.id === "closeButton"){
@@ -173,6 +171,18 @@ class SearchBackup extends Component {
   }
 }
 
-export default SearchBackup;
+export default Search;
 
 
+
+<div className="collapse" id="collapseExample">
+                        <div>
+                            <div className="card">
+                                <div className="card-body text-dark">
+                                    <h5 className="card-title">{this.state.isLoaded}</h5>
+                                    {this.state.isLoaded === "Loaded" &&
+                                    <button type="button" className="btn btn-primary">View</button>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>

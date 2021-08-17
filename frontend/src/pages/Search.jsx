@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import '../App.css';
 import axios from 'axios';
-import searchTable from "../components/searchTable";
-
+import SearchTable from "../components/searchTable";
 
 class Search extends Component {
     constructor(props){
@@ -15,32 +14,12 @@ class Search extends Component {
             searchQ:"",
             searchUnit:"",
             searchCustodian:"",
+
+            isLoaded:"Searching..."
         }
         this.handleInput = this.handleInput.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
     }
-
-    async searchDB() {
-        const _this = this;
-        await axios.post('/search', {
-            sample_type: _this.state.searchType,
-                    sample_ID: _this.state.searchID,
-                    loc: _this.state.searchLoc,
-                    status: _this.state.searchStatus,
-                    Q: _this.state.searchQ,
-                    unit: _this.state.searchUnit,
-                    custodian: _this.state.searchCustodian
-                })
-                    .then(function (response) {
-                        console.log(response.data);
-                        _this.setState({
-                            outputData: response.data
-                        })
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-            }
 
     handleInput = (e) => {
         if (e.target.id === "searchSampleType"){
@@ -78,25 +57,35 @@ class Search extends Component {
                 searchCustodian: e.target.value
             })
         }
-
     }
 
-    onButtonClick = (e) => {
-        //console.log('.....');
-        if (e.target.id === "searchButton") {
-            return this.searchDB()
-        }
 
+    onButtonClick = (e) => {
+        if (e.target.id === "searchButton") {
+            const _this = this;
+        axios.post('/search', {
+            sample_type: _this.state.searchType,
+            sample_ID: _this.state.searchID,
+            loc: _this.state.searchLoc,
+            status: _this.state.searchStatus,
+            Q: _this.state.searchQ,
+            unit: _this.state.searchUnit,
+            custodian: _this.state.searchCustodian
+        })
+            .then(function (response) {
+                _this.setState({
+                    outputData: response.data.Data,
+                    isLoaded: "Searched results："
+                })
+                console.log(response)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+        }
         else if (e.target.id === "closeButton"){
             this.setState({
-                searchType: "",
-                searchID:"",
-                searchLoc:"",
-                searchStatus:"",
-                searchQ:"",
-                searchUnit:"",
-                searchCustodian:"",
-                outputData:""
+                outputData:[]
             })
         }
     }
@@ -152,16 +141,40 @@ class Search extends Component {
                     </div>
 
                     <button type="button" className="btn btn-primary" data-bs-toggle="collapse"
-                            data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
+                            data-bs-target="#collapseExample" aria-controls="collapseExample"
                             id= "searchButton" onClick={this.onButtonClick}>Search</button>
 
                     <div className="collapse" id="collapseExample">
-                        <div className="card">
-                            <div className="card-body text-dark">
-                                {JSON.stringify(this.state.outputData)}
+                        <div>
+                            <div className="card text-center">
+                                <div className="card-body text-dark">
+                                    <h5 className="card-title">{this.state.isLoaded}</h5>
+                                    {this.state.isLoaded === "Searched results：" &&
+                                        <div class = "table-responsive">
+                                        <table className="table table-bordered border-primary">
+                                            <thead>
+                                            <tr>
+                                                <th className="text-center">Type</th>
+                                                <th className="text-center">ID</th>
+                                                <th className="text-center">Location</th>
+                                                <th className="text-center">Quantity change</th>
+                                                <th className="text-center">Quantity unit</th>
+                                                <th className="text-center">Status</th>
+                                                <th className="text-center">Latest operated by</th>
+                                                <th className="text-center">At what time</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <SearchTable outputData={this.state.outputData}/>
+                                            </tbody>
+                                        </table>
+                                        </div>}
+                                </div>
+                                <button type="reset" className="btn btn-primary" id="closeButton" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseExample" aria-controls="collapseExample"
+                                        onClick={this.onButtonClick}>Close</button>
                             </div>
                         </div>
-
                     </div>
 
 
@@ -175,4 +188,6 @@ class Search extends Component {
 }
 
 export default Search;
+
+
 
