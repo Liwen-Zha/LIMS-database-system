@@ -57,13 +57,13 @@ class App extends Component {
                                         </div>
                                         <div className="col">
                                             <NavLink to='/view-samples'>
-                                                <button className="btn btn-outline-danger btn-lg" type="button">View samples
+                                                <button className="btn btn-outline-danger btn-lg" type="button">View all samples
                                                 </button>
                                             </NavLink>
                                         </div>
                                         <div className="col">
                                             <NavLink to='/view-logs'>
-                                                <button className="btn btn-outline-warning btn-lg" type="button">View
+                                                <button className="btn btn-outline-warning btn-lg" type="button">View all logs
                                                 </button>
                                             </NavLink>
                                         </div>

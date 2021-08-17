@@ -106,26 +106,30 @@ def view_logs():
         i=0
         logResults = []
         for each in all_logs:
-            who = each[0]
-            sample = each[2]
-            where = each[4]
-            Qvar = all_logs_info[i]['Qvar']
-            Qvar_unit = all_logs_info[i]['Qvar_unit']
-            Qnow = all_logs_info[i]['Qnow']
-            Qnow_unit = all_logs_info[i]['Qnow_unit']
-            time = each[6]
+            allLogs_who = each[0]
+            allLogs_sample = each[2]
+            allLogs_where = each[4]
+            allLogs_type = all_logs_info[i]['type']
+            allLogs_Qvar = all_logs_info[i]['Qvar']
+            allLogs_Qvar_unit = all_logs_info[i]['Qvar_unit']
+            allLogs_Qnow = all_logs_info[i]['Qnow']
+            allLogs_Qnow_unit = all_logs_info[i]['Qnow_unit']
+            allLogs_status = all_logs_info[i]['status']
+            allLogs_time = each[6]
 
             logResult = {
-                'custodian': who,
-                'id': sample,
-                'loc': where,
-                'Qvar': Qvar,
-                'Qvar_unit': Qvar_unit,
-                'Qnow': Qnow,
-                'Qnow_unit': Qnow_unit,
-                'time': time
+                'custodian': allLogs_who,
+                'type': allLogs_type,
+                'id': allLogs_sample,
+                'loc': allLogs_where,
+                'Qvar': allLogs_Qvar,
+                'Qvar_unit': allLogs_Qvar_unit,
+                'Qnow': allLogs_Qnow,
+                'Qnow_unit': allLogs_Qnow_unit,
+                'time': allLogs_time,
+                'status': allLogs_status
             }
-
+            print(logResult)
             logResults.append(logResult)
             i = i + 1
 
