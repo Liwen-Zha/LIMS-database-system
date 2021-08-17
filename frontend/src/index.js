@@ -21,8 +21,8 @@ ReactDOM.render(
             <Route path = '/log' component={Log} />
             <Route path = '/search' component={Search} />
             <Route path = '/check' component={Check} />
-            <Route path = '/view-samples' component={ViewSamples} />
             <Route path = '/view-logs' component={ViewLogs} />
+            <Route path = '/view-samples' component={ViewSamples} />
         </Switch>
     </HashRouter>,
     document.getElementById('root')

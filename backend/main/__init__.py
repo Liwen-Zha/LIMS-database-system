@@ -148,26 +148,28 @@ def view_samples():
     if all_samples:
         sampleResults = []
         for each in all_samples:
-            type = each[0]
-            ID = each[1]
-            Qnow = each[2]
-            Qnow_unit = each[3]
-            where = each[4]
-            status = each[5]
-            custodian = each[6]
+            print(each)
+
+            allSamples_type = each[0]
+            allSamples_ID = each[1]
+            allSamples_Qnow = each[2]
+            allSamples_Qnow_unit = each[3]
+            allSamples_where = each[4]
+            allSamples_status = each[5]
+            allSamples_custodian = each[6]
 
             sampleResult = {
-                'type': type,
-                'id': ID,
-                'Qnow': Qnow,
-                'Qnow_unit': Qnow_unit,
-                'loc': where,
-                'status': status,
-                'latest_custodian': custodian
+                'type': allSamples_type,
+                'id': allSamples_ID,
+                'Qnow': allSamples_Qnow,
+                'Qnow_unit': allSamples_Qnow_unit,
+                'loc': allSamples_where,
+                'status': allSamples_status,
+                'latest_custodian': allSamples_custodian
             }
 
             sampleResults.append(sampleResult)
-            print(each)
+
 
         return jsonify({'Status': '200 OK', 'Method': request.method,'Data': sampleResults}),200
 

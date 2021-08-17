@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../App.css'
 import axios from "axios";
-import LogsTable from "../components/logsTable";
+import ViewLogsTable from "../components/viewLogsTable";
 
 class ViewLogs extends Component {
     constructor(props){
@@ -64,7 +64,7 @@ class ViewLogs extends Component {
                             </thead>
 
                             <tbody>
-                            <LogsTable allLogs={this.state.allLogs}/>
+                            <ViewLogsTable allLogs={this.state.allLogs}/>
                             </tbody>
                         </table>
                     </div>

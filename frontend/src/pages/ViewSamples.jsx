@@ -1,17 +1,74 @@
 import React, {Component} from 'react';
 import '../App.css'
+import axios from "axios";
+import ViewSamplesTable from "../components/viewSamplesTable";
 
 class ViewSamples extends Component {
+    constructor(props){
+    super(props);
+    this.state={
+      allSamples:[],
+      isLoaded:false
+    }
+  }
+
+  componentDidMount(){
+    const _this=this;
+    axios.get('/view-samples')
+    .then(function (response) {
+      _this.setState({
+        allSamples:response.data.Data,
+        isLoaded:true
+      });
+    })
+    .catch(function (error) {
+      console.log(error);
+      _this.setState({
+        isLoaded:false,
+        error:error
+      })
+    })
+  }
+
   render() {
-    return (
-        <div>
-            <body className="d-flex text-center text-white bg-dark">
-            <div className="main-page-config d-flex p-3 mx-auto flex-column">
-                <h1>This is View samples page!</h1>
-            </div>
-            </body>
-        </div>
-    );
+        if(!this.state.isLoaded){
+            return (
+                <div>
+                    <body className="d-flex text-center text-white bg-dark">
+                    <div className="main-page-config d-flex p-3 mx-auto flex-column">
+                        <h1>Loading...</h1>
+                    </div>
+                    </body>
+                </div>
+            );
+        }
+        else {
+            return (
+                <div>
+                    <body className="d-flex text-center text-white bg-dark">
+                    <div className="main-page-config d-flex p-3 mx-auto flex-column">
+                        <table className="table table-warning table-striped text-dark">
+                            <thead>
+                            <tr>
+                                <th className="text-center">Type</th>
+                                <th className="text-center">ID</th>
+                                <th className="text-center">Location</th>
+                                <th className="text-center">Current quantity</th>
+                                <th className="text-center">Unit</th>
+                                <th className="text-center">Current Status</th>
+                                <th className="text-center">Current custodian</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <ViewSamplesTable allSamples={this.state.allSamples}/>
+                            </tbody>
+                        </table>
+                    </div>
+                    </body>
+                </div>
+            );
+        }
   }
 }
 
