@@ -12,7 +12,8 @@ class SearchTable extends Component{
                 <td>{eachLine.loc}</td>
                 <td>{eachLine.Qvar}</td>
                 <td>{eachLine.Qvar_unit}</td>
-                <td>{eachLine.status}</td>
+                <td>{eachLine.Qnow}</td>
+                <td>{eachLine.Qnow_unit}</td>
                 <td>{eachLine.custodian}</td>
                 <td>{eachLine.time}</td>
               </tr>

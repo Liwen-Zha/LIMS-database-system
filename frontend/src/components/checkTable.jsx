@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class SearchTable extends Component{
+class CheckTable extends Component{
 
     render(){
         return (
@@ -10,11 +10,10 @@ class SearchTable extends Component{
                 <td>{eachLine.type}</td>
                 <td>{eachLine.id}</td>
                 <td>{eachLine.loc}</td>
-                <td>{eachLine.Qvar}</td>
-                <td>{eachLine.Qvar_unit}</td>
+                <td>{eachLine.Qnow}</td>
+                <td>{eachLine.Qnow_unit}</td>
                 <td>{eachLine.status}</td>
-                <td>{eachLine.custodian}</td>
-                <td>{eachLine.time}</td>
+                <td>{eachLine.latest_custodian}</td>
               </tr>
           )
       })
@@ -23,4 +22,4 @@ class SearchTable extends Component{
   }
 }
 
-export default SearchTable
+export default CheckTable

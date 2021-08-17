@@ -85,6 +85,7 @@ class Search extends Component {
         }
         else if (e.target.id === "closeButton"){
             this.setState({
+                isLoaded:"Searching...",
                 outputData:[]
             })
         }
@@ -95,7 +96,7 @@ class Search extends Component {
         <div>
             <body className="d-flex text-left text-white bg-dark">
             <div className="main-page-config d-flex p-3 mx-auto flex-column">
-                <h4 className="float-md-start font-monospace">Please log sample transaction：</h4>
+                <h4 className="float-md-start font-monospace">Please input search criteria：</h4>
                 <form>
                     <div className="mb-0">
                         <label htmlFor="inputSampleType" className="Sample Type:">Sample Type:</label>
@@ -158,10 +159,11 @@ class Search extends Component {
                                                 <th className="text-center">ID</th>
                                                 <th className="text-center">Location</th>
                                                 <th className="text-center">Quantity change</th>
-                                                <th className="text-center">Quantity unit</th>
-                                                <th className="text-center">Status</th>
-                                                <th className="text-center">Latest operated by</th>
-                                                <th className="text-center">At what time</th>
+                                                <th className="text-center">Unit</th>
+                                                <th className="text-center">Current quantity</th>
+                                                <th className="text-center">Unit</th>
+                                                <th className="text-center">Operated by</th>
+                                                <th className="text-center">Time</th>
                                             </tr>
                                             </thead>
                                             <tbody>

@@ -58,28 +58,28 @@ def search_sample():
         i = 0
         searchResults = []
         for each in searched_sample:
-            who = each[0]
-            thistype = searched_sample_info[i]['type'][1:-1]
-            thissample = each[2]
-            thisstatus = searched_sample_info[i]['status'][1:-1]
-            where = each[4]
-            thisQvar = searched_sample_info[i]['Qvar']
-            thisQvar_unit = searched_sample_info[i]['Qvar_unit'][1:-1]
-            thisQnow = searched_sample_info[i]['Qnow']
-            thisQnow_unit = searched_sample_info[i]['Qnow_unit'][1:-1]
-            thistime = each[6]
+            searchwho = each[0]
+            searchtype = searched_sample_info[i]['type'][1:-1]
+            searchsample = each[2]
+            searchstatus = searched_sample_info[i]['status'][1:-1]
+            searchwhere = each[4]
+            searchQvar = searched_sample_info[i]['Qvar']
+            searchQvar_unit = searched_sample_info[i]['Qvar_unit'][1:-1]
+            searchQnow = searched_sample_info[i]['Qnow']
+            searchQnow_unit = searched_sample_info[i]['Qnow_unit'][1:-1]
+            searchtime = each[6]
 
             searchResult = {
-                "custodian": who,
-                "type": thistype,
-                "status": thisstatus,
-                "id": thissample,
-                "loc": where,
-                "Qvar": thisQvar,
-                "Qvar_unit": thisQvar_unit,
-                "Qnow": thisQnow,
-                "Qnow_unit": thisQnow_unit,
-                "time": thistime
+                "custodian": searchwho,
+                "type": searchtype,
+                "status": searchstatus,
+                "id": searchsample,
+                "loc": searchwhere,
+                "Qvar": searchQvar,
+                "Qvar_unit": searchQvar_unit,
+                "Qnow": searchQnow,
+                "Qnow_unit": searchQnow_unit,
+                "time": searchtime
             }
             print(searchResult)
             searchResults.append(searchResult)
@@ -180,31 +180,31 @@ def check_db():
     '''
     dict_value = request.get_json()
 
-
     checked_data = model.check(dict_value['sample_type'], dict_value['sample_ID'], dict_value['loc'],
-                               dict_value['status'], dict_value['custodian'])[1]
+                               dict_value['status'], dict_value['custodian'])[0]
+
     if checked_data:
         checkResults = []
         for each in checked_data:
-            type = each[0]
-            ID = each[1]
-            Qnow = each[2]
-            Qnow_unit = each[3]
-            where = each[4]
-            status = each[5]
-            custodian = each[6]
+            print(each)
+            checktype = each[1]
+            checkID = each[3]
+            checkQnow = each[5]
+            checkQnow_unit = each[7]
+            checkwhere = each[9]
+            checkstatus = each[11]
+            checkcustodian = each[13]
 
             checkResult = {
-                'type': type,
-                'id': ID,
-                'Qnow': Qnow,
-                'Qnow_unit': Qnow_unit,
-                'loc': where,
-                'status': status,
-                'latest_custodian': custodian,
+                'type': checktype,
+                'id': checkID,
+                'Qnow': checkQnow,
+                'Qnow_unit': checkQnow_unit,
+                'loc': checkwhere,
+                'status': checkstatus,
+                'latest_custodian': checkcustodian,
             }
             checkResults.append(checkResult)
-            print(each)
 
         return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': checkResults}),200
 
