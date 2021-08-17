@@ -65,6 +65,9 @@ class Check extends Component {
                 console.log(response)
             })
             .catch(function (error) {
+                _this.setState({
+                    isLoaded: "Fail to check status!"
+                })
                 console.log(error);
             })
         }

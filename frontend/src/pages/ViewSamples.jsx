@@ -18,15 +18,14 @@ class ViewSamples extends Component {
     .then(function (response) {
       _this.setState({
         allSamples:response.data.Data,
-        isLoaded:true
+        isLoaded:"All samples:"
       });
     })
     .catch(function (error) {
-      console.log(error);
       _this.setState({
-        isLoaded:false,
-        error:error
+        isLoaded: "Fail to view all samples!"
       })
+        console.log(error);
     })
   }
 
@@ -47,6 +46,7 @@ class ViewSamples extends Component {
                 <div>
                     <body className="d-flex text-center text-white bg-dark">
                     <div className="main-page-config d-flex p-3 mx-auto flex-column">
+                        <h5 className="card-title">{this.state.isLoaded}</h5>
                         <table className="table table-warning table-striped text-dark">
                             <thead>
                             <tr>
@@ -64,6 +64,7 @@ class ViewSamples extends Component {
                             <ViewSamplesTable allSamples={this.state.allSamples}/>
                             </tbody>
                         </table>
+
                     </div>
                     </body>
                 </div>

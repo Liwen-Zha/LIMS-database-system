@@ -80,6 +80,9 @@ class Search extends Component {
                 console.log(response)
             })
             .catch(function (error) {
+                _this.setState({
+                    isLoaded: "Fail to search the log(s)!"
+                })
                 console.log(error);
             })
         }

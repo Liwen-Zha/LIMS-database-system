@@ -34,61 +34,61 @@ def insert(sample_type, sample_ID, loc, status, Q, unit, custodian):
     unit -- the unit of Q (e.g., ml, tube, plate)
     custodian -- the custodian of the sample transaction （e.g., peter, linda)
     '''
-    node_sample = Node('Sample', type=repr(sample_type), id=repr(sample_ID),
+    if (sample_type and sample_ID and loc and status and Q and unit and custodian):
+        node_sample = Node('Sample', type=repr(sample_type), id=repr(sample_ID),
                        Qvar=float(Q), Qvar_unit=repr(unit),Qinit=None, Qinit_unit=None,
                        Qnow=None, Qnow_unit=None,status =repr(status))
-
-    check_existence = backend.graph_database.mathtools.existenceChecker(sample_ID, loc, custodian)
-
-    if check_existence.check_existing_samples() and len(check_existence.check_existing_samples()) >= 1:
-
-        find_samples = backend.graph_database.mathtools.sampleFinder(sample_ID)
-
-        node_pre_sample = find_samples.find_last_sample()
-        node_1st_sample = find_samples.find_first_sample()
-        update_Qinit = node_1st_sample['Qinit']
-        update_Qinit_unit = node_1st_sample['Qinit_unit']
-        node_sample.update({'Qinit': float(update_Qinit), 'Qinit_unit': update_Qinit_unit})
+        check_existence = backend.graph_database.mathtools.existenceChecker(sample_ID, loc, custodian)
+        if check_existence.check_existing_samples() and len(check_existence.check_existing_samples()) >= 1:
+            find_samples = backend.graph_database.mathtools.sampleFinder(sample_ID)
+            node_pre_sample = find_samples.find_last_sample()
+            node_1st_sample = find_samples.find_first_sample()
+            update_Qinit = node_1st_sample['Qinit']
+            update_Qinit_unit = node_1st_sample['Qinit_unit']
+            node_sample.update({'Qinit': float(update_Qinit), 'Qinit_unit': update_Qinit_unit})
 
         # Use the class quantityCalculator() in tools.py to calculate the current quantity of the sample.
         # Notice: for each sample id, the result of quantityCalculator() is the sum of all previous quantity variations
         #         of the sample, which means it excludes the quantity variation of the current sample transaction.
-        calculate_quantity = backend.graph_database.mathtools.quantityCalculator(sample_ID)
-        previous_quantity = calculate_quantity.calculate_quantity_variations()
-        current_quantity = previous_quantity + float(Q)
-        node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})
+            calculate_quantity = backend.graph_database.mathtools.quantityCalculator(sample_ID)
+            previous_quantity = calculate_quantity.calculate_quantity_variations()
+            current_quantity = previous_quantity + float(Q)
+            node_sample.update({'Qnow': float(current_quantity), 'Qnow_unit': repr(unit)})
+
+            time = get_time()
+            properties1={'at': repr(time)}
+            rel_child_of = Relationship(node_pre_sample, 'QUANTITY_CHANGE', node_sample, **properties1)
+            s0 = node_pre_sample | node_sample | rel_child_of
+            graph.create(s0)
+        else:
+            node_sample.update({'Qinit': float(Q), 'Qinit_unit': repr(unit)})
+            node_sample.update({'Qnow': float(Q), 'Qnow_unit': repr(unit)})
+
+        if check_existence.check_existing_freezers():
+            node_freezer = check_existence.check_existing_freezers().first()
+        else:
+            node_freezer = Node('Freezer', id=repr(loc))
+
+        if check_existence.check_existing_persons():
+            node_custodian = check_existence.check_existing_persons().first()
+        else:
+            node_custodian = Node('Person', name=repr(custodian))
+
+        rel_in = Relationship(node_sample,'IN',node_freezer)
+        s1 = node_sample | node_freezer | rel_in
+        graph.create(s1)
 
         time = get_time()
-        properties1={'at': repr(time)}
-        rel_child_of = Relationship(node_pre_sample, 'QUANTITY_CHANGE', node_sample, **properties1)
-        s0 = node_pre_sample | node_sample | rel_child_of
-        graph.create(s0)
+        properties2={'at': repr(time)}
+        rel_record = Relationship(node_custodian,'OPERATE',node_sample, **properties2)
+        s2 = node_custodian | node_sample | rel_record
+        graph.create(s2)
+
+        return True
 
     else:
-        node_sample.update({'Qinit': float(Q), 'Qinit_unit': repr(unit)})
-        node_sample.update({'Qnow': float(Q), 'Qnow_unit': repr(unit)})
+        return False
 
-    if check_existence.check_existing_freezers():
-        node_freezer = check_existence.check_existing_freezers().first()
-    else:
-        node_freezer = Node('Freezer', id=repr(loc))
-
-    if check_existence.check_existing_persons():
-        node_custodian = check_existence.check_existing_persons().first()
-    else:
-        node_custodian = Node('Person', name=repr(custodian))
-
-    rel_in = Relationship(node_sample,'IN',node_freezer)
-    s1 = node_sample | node_freezer | rel_in
-    graph.create(s1)
-
-    time = get_time()
-    properties2={'at': repr(time)}
-    rel_record = Relationship(node_custodian,'OPERATE',node_sample, **properties2)
-    s2 = node_custodian | node_sample | rel_record
-    graph.create(s2)
-
-    return True
 
 def search(sample_type, sample_ID, loc, status, Q, unit, custodian):
     '''

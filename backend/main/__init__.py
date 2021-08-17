@@ -37,7 +37,7 @@ def log_sample():
         return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': sampleInfo})
     else:
         print("sample log failed")
-        return jsonify({"errorMsg": "Failed add sample"}), 400
+        return jsonify({'errorMsg': "Fail to add sample!"}), 400
 
 
 @main.route('/search', methods = ["POST"])
@@ -91,7 +91,7 @@ def search_sample():
         #return jsonify(searchResults)
 
     else:
-        return jsonify({"errorMsg": "Failed search sample"}), 400
+        return jsonify({"errorMsg": "Fail to search the log(s)!"}), 400
 
 @main.route('/view-logs', methods = ["GET"])
 def view_logs():
@@ -136,7 +136,7 @@ def view_logs():
         return jsonify({'Status': '200 OK', 'Method': request.method, 'Data': logResults}), 200
 
     else:
-        return jsonify({"errorMsg": "Failed view the logbook"}), 400
+        return jsonify({"errorMsg": "Fail to view all logs!"}), 400
 
 @main.route('/view-samples', methods = ["GET"])
 def view_samples():
@@ -174,7 +174,7 @@ def view_samples():
         return jsonify({'Status': '200 OK', 'Method': request.method,'Data': sampleResults}),200
 
     else:
-        return jsonify({"errorMsg": "Failed view all samples"}), 400
+        return jsonify({"errorMsg": "Fail to view all samples!"}), 400
 
 @main.route('/check', methods = ["POST"])
 def check_db():
@@ -216,7 +216,7 @@ def check_db():
 
     else:
 
-        return jsonify({"errorMsg": "Failed check status"}), 400
+        return jsonify({"errorMsg": "Fail to check status!"}), 400
 
 
 

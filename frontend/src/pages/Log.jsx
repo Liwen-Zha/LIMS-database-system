@@ -14,7 +14,8 @@ class Log extends Component {
             inputQ:"",
             inputUnit:"",
             inputCustodian:"",
-            outputData:""
+            outputData:"",
+            isLoaded:"Loading"
         }
         this.handleInput = this.handleInput.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
@@ -73,26 +74,23 @@ class Log extends Component {
                 custodian: _this.state.inputCustodian
             })
                 .then(function (response) {
-                    console.log(response.data);
                     _this.setState({
-                        outputData: response.data
+                        outputData: response.data,
+                        isLoaded: "You have successfully submitted the sample log!"
                     })
+                    console.log(response.data);
                 })
                 .catch(function (error) {
+                    _this.setState({
+                        isLoaded: "Fail to add sample!"
+                    })
                     console.log(error);
                 })
         }
 
         else if (e.target.id === "closeButton"){
             this.setState({
-                inputType: "",
-                inputID:"",
-                inputLoc:"",
-                inputStatus:"",
-                inputQ:"",
-                inputUnit:"",
-                inputCustodian:"",
-                outputData:""
+                isLoaded:"Loading"
             })
         }
     }
@@ -158,10 +156,10 @@ class Log extends Component {
                                     <h5 class="modal-title text-dark" id="staticBackdropLabel">Notice</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body text-dark">You have successfully submitted the sample log!</div>
+                                <div class="modal-body text-dark">{this.state.isLoaded}</div>
                                 <div class="modal-footer">
                                     <button type="reset" class="btn btn-primary" data-bs-dismiss="modal"
-                                            id="closeButton">Close</button>
+                                            id="closeButton" onClick={this.onButtonClick}>Close</button>
                                 </div>
                             </div>
                         </div>

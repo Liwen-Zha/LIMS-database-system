@@ -18,15 +18,14 @@ class ViewLogs extends Component {
     .then(function (response) {
       _this.setState({
         allLogs:response.data.Data,
-        isLoaded:true
+        isLoaded: "ALl logs:"
       });
     })
     .catch(function (error) {
-      console.log(error);
       _this.setState({
-        isLoaded:false,
-        error:error
+        isLoaded:"Fail to view all logs!"
       })
+        console.log(error);
     })
   }
 
@@ -47,6 +46,7 @@ class ViewLogs extends Component {
                 <div>
                     <body className="d-flex text-center text-white bg-dark">
                     <div className="main-page-config d-flex p-3 mx-auto flex-column">
+                        <h5 className="card-title">{this.state.isLoaded}</h5>
                         <table className="table table-success table-striped text-dark">
                             <thead>
                             <tr>
