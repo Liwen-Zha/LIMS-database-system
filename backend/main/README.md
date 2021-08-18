@@ -71,6 +71,13 @@ ___
 }
 ```
 
+#### Comments:
+For /log, all the variables being sent to the web server are supposed not to be empty fields, as the sample registration 
+should always include all aspects of the transaction details. However, they can be empty fields. That is because the 
+backend function (insert()) called via the API (/log) has a built-in logic to alert users when they input empty fields.
+In other words, instead of rejecting empty fields, insert() accepts empty fields and responds to them with a reminder.
+
+
 ___
 
 ## Search sample records
@@ -136,9 +143,20 @@ ___
 
 ```json
 {
-  "errorMsg": "Failed search sample"
+  "errorMsg": "Fail to search the log(s)!"
 }
 ```
+
+#### Comments:
+For /search, all the variables being sent to the web server can be empty fields or not. The reason why the empty fields 
+are allowed here is to consider the situation that users sometimes may just want to search a group of data records with same
+attributes. The above case is such an instance, where the user only wanted to find the data records related to blood blo001 in freezer001
+that was specifically operated by peter. Therefore, when other people such as helen operated blo001, or when blo001 was
+moved and stored in freezer002, the related data records would not be searched and considered. The API (/search) calls the function
+(search()) in backend to operate the user inputs. If some of the variables are empty fields, the backend function (search()) will ignore 
+them and only read values of the variables that are not empty fields, then according to the reading values it can do the corresponding data
+matching in the backend database. If there are no matching records, it will show the error message "Fail to search the log(s)!".
+
 
 ___
 
@@ -205,9 +223,17 @@ ___
 
 ```json
 {
-    "errorMsg": "Failed view the logbook"
+    "errorMsg": "Fail to view all logs!"
 }
 ```
+
+
+####Comments:
+For /view-logs, all the sample records/transactions/history logged into the LIMS will be shown in a table format. It is
+like a logbook, recording all the sample actions happened in the lab from the past to the future. As the database grows, 
+the logbook should always be huge, this function may not be used as often as other functions. But it is useful to keep it 
+in the API(/view-logs), acting as a fundamental way of viewing the entire logbook. The 400 code will happen when there is 
+not a single record in the database. In other words, it is just right before the LIMS starts to be used in the lab. 
 
 ___
 
@@ -257,6 +283,14 @@ ___
 }
 ```
 
+####Comments:
+For /view-samples, all the samples registered into the LIMS will be shown in a table format. It is like a 
+automatically-updated sample catalogue, recording the latest information of all the samples in the lab. Like /view-logs, 
+it may not be called very often, but it is useful to keep such a function to have an overview of the lab's sample inventory.
+Database contains all the detailed information of the registered sample, including the quantity variation, initial quantity
+and the current quantity. But this function aims to show the latest information (current sample status), it will only
+provide the information of the current quantity to the users, regardless of the past transactions. 
+
 ___
 
 
@@ -271,7 +305,7 @@ ___
 ```json
 {
   "sample_type": "blood",
-  "sample_ID": "blo001",
+  "sample_ID": "",
   "loc": "",
   "status": "",
   "custodian": ""
@@ -289,8 +323,8 @@ ___
 {
   "Status": "200 OK",
   "Method": "POST",
-  "Data":
-  {
+  "Data": [
+    {
     "type": "blood",
     "id": "blo001",
     "Qnow": "18",
@@ -298,7 +332,17 @@ ___
     "loc": "freezer001",
     "status": "available",
     "latest_custodian": "peter"
+  },
+    {
+    "type": "blood",
+    "id": "blo002",
+    "Qnow": "11",
+    "Qnow_unit": "ml",
+    "loc": "freezer002",
+    "status": "available",
+    "latest_custodian": "helen"
   }
+  ]
 }
 ```
 
@@ -309,7 +353,21 @@ ___
 
 ```json
 {
-  "errorMsg": "Failed check status"
+  "errorMsg": "Fail to check status!"
 }
 ```
+#### Comments:
+For /check, all the variables being sent to the web server can be empty fields or not, just like /search. 
+The reason why the empty fields are allowed here is to consider the situation that users sometimes may just want to check
+the sample status in a specific circumstance. For example, check all the samples in a designated freezer, or check 
+all the samples supervised by a designated custodian. The above case is such an instance, where the user only wanted to 
+check all the blood samples in the lab. In this case, sample_type (blood) was a restricted condition. Only the records of 
+blood samples could be matched and checked in the database. The difference of between the check function and the search function
+is that the former one only shows the latest information/status of the samples we want to check, while the latter one shows
+all the records/transactions/history of the samples we want to search. The API (/check) calls the function (check()) in 
+backend to operate the user inputs. If some of the inputs are empty fields, the backend function (check()) will ignore 
+them and only read values of the variables that are not empty fields, then according to the reading values it can do the 
+corresponding data matching in the backend database. If there are no matching records, it will show the error message 
+"Fail to check status!".
+
 
