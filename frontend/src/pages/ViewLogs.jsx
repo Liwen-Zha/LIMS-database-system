@@ -18,7 +18,7 @@ class ViewLogs extends Component {
     .then(function (response) {
       _this.setState({
         allLogs:response.data.Data,
-        isLoaded: "ALl logs:"
+        isLoaded: "All logs:"
       });
     })
     .catch(function (error) {

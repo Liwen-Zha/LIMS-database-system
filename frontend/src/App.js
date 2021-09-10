@@ -73,8 +73,8 @@ class App extends Component {
                         </main>
 
                         <footer class="mt-auto text-white-50">
-                            <p>Home page from<a href="https://getbootstrap.com/" class="text-white">Bootstrap</a>, by <a
-                                href="https://www.imperial.ac.uk" class="text-white">@imperial</a>.</p>
+                            <p>Home page from<a href="https://getbootstrap.com/" class="text-white">React & Bootstrap</a>, by <a
+                                href="https://www.imperial.ac.uk" class="text-white">@Liwen Zha from Imperial College London</a>.</p>
                         </footer>
                     </div>
 
